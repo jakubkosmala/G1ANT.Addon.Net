@@ -33,28 +33,33 @@
   <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="BouncyCastle.Crypto, Version=1.8.4.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\..\packages\BouncyCastle.1.8.4\lib\BouncyCastle.Crypto.dll</HintPath>
+      <HintPath>..\packages\BouncyCastle.1.8.4\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
-    <Reference Include="G1ANT.Language, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\G1ANT.Bin\debug\G1ANT.Language.dll</HintPath>
+    <Reference Include="G1ANT.Language, Version=4.101.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\G1ANT.Language.4.101.0\lib\net452\G1ANT.Language.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.6.11.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.6.11\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="MailKit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MailKit.2.1.2\lib\net45\MailKit.dll</HintPath>
+      <HintPath>..\packages\MailKit.2.1.2\lib\net45\MailKit.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="MimeKit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MimeKit.2.1.2\lib\net45\MimeKit.dll</HintPath>
+      <HintPath>..\packages\MimeKit.2.1.2\lib\net45\MimeKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=106.2.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RestSharp.106.2.1\lib\net452\RestSharp.dll</HintPath>
+      <HintPath>..\packages\RestSharp.106.2.1\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
@@ -103,12 +108,12 @@
     <EmbeddedResource Include="Resources\image4.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\packages\*\lib\net452\RestSharp.dll">
+    <EmbeddedResource Include="..\packages\*\lib\net452\RestSharp.dll">
       <Link>RestSharp.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\packages\*\lib\*net40*\System.ValueTuple.dll">
+    <EmbeddedResource Include="..\packages\*\lib\*net40*\System.ValueTuple.dll">
       <Link>System.ValueTuple.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
@@ -116,17 +121,17 @@
     <EmbeddedResource Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\packages\MailKit.2.1.2\lib\net45\MailKit.dll">
+    <EmbeddedResource Include="..\packages\MailKit.2.1.2\lib\net45\MailKit.dll">
       <Link>MailKit.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\packages\MimeKit.2.1.2\lib\net45\MimeKit.dll">
+    <EmbeddedResource Include="..\packages\MimeKit.2.1.2\lib\net45\MimeKit.dll">
       <Link>MimeKit.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\packages\BouncyCastle.1.8.4\lib\BouncyCastle.Crypto.dll">
+    <EmbeddedResource Include="..\packages\BouncyCastle.1.8.4\lib\BouncyCastle.Crypto.dll">
       <Link>BouncyCastle.Crypto.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
