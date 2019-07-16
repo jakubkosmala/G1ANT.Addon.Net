@@ -16,7 +16,7 @@ using MailKit.Net.Imap;
 using G1ANT.Language;
 using G1ANT.Language.Models;
 using System.Net;
-
+using MailKit.Search;
 
 namespace G1ANT.Addon.Net
 {
@@ -30,6 +30,9 @@ namespace G1ANT.Addon.Net
 
             [Argument(Required = true, Tooltip = "IMAP server port number")]
             public IntegerStructure Port { get; set; } = new IntegerStructure(993);
+
+            [Argument(Required = true, Tooltip = "If set to `true`, this command will use https protocole")]
+            public BooleanStructure UseHttps { get; set; } = new BooleanStructure(true);
 
             [Argument(Required = true, Tooltip = "User email login")]
             public TextStructure Login { get; set; }
@@ -71,7 +74,7 @@ namespace G1ANT.Addon.Net
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
             var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
-            var uri = new UriBuilder("imaps", arguments.Host.Value, arguments.Port.Value).Uri;
+            var uri = new UriBuilder(arguments.UseHttps.Value ? "imaps" : "imap", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
             var markAllMessagesAsRead = arguments.MarkAsRead.Value;
 
@@ -80,7 +83,7 @@ namespace G1ANT.Addon.Net
             if (client.IsConnected && client.IsAuthenticated)
             {
                 var folder = client.GetFolder(arguments.Folder.Value);
-                folder.Open(FolderAccess.ReadOnly);
+                folder.Open(FolderAccess.ReadWrite);
                 var messages = ReceiveMesssages(folder, arguments);
                 SendMessageListToScripter(folder, arguments, messages);
 
@@ -102,7 +105,7 @@ namespace G1ANT.Addon.Net
             var messageList = new ListStructure();
             foreach (var message in messages)
             {
-                var attachments = CreateAttachmentStructuresFromAttachments(message,folder,message.Attachments);
+                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.Attachments);
                 var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder, attachments);
                 var structure = new MailStructure(messageWithFolder, null, null);
                 messageList.AddItem(structure);
@@ -110,7 +113,7 @@ namespace G1ANT.Addon.Net
             return messageList;
         }
 
-        private ListStructure CreateAttachmentStructuresFromAttachments (IMessageSummary message,IMailFolder folder, 
+        private ListStructure CreateAttachmentStructuresFromAttachments(IMessageSummary message, IMailFolder folder,
             IEnumerable<BodyPartBasic> attachments)
         {
             ListStructure attachmentsList = new ListStructure();
@@ -129,7 +132,9 @@ namespace G1ANT.Addon.Net
                           MessageSummaryItems.Body |
                           MessageSummaryItems.BodyStructure |
                           MessageSummaryItems.UniqueId;
-            var allMessages = folder.Fetch(0, -1, options).ToList();
+            var query = SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+            var uids = folder.Search(query);
+            var allMessages = folder.Fetch(uids, options).ToList();
             var onlyUnread = arguments.OnlyUnreadMessages.Value;
             var since = arguments.SinceDate.Value;
             var to = arguments.ToDate.Value;
