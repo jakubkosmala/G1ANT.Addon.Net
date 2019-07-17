@@ -3,7 +3,7 @@
 ## Syntax
 
 ```G1ANT
-mail.smtp host ⟦text⟧ port ⟦integer⟧ login ⟦text⟧ password ⟦text⟧ from ⟦text⟧ to ⟦text⟧ cc ⟦text⟧ bcc ⟦text⟧ subject ⟦text⟧ body ⟦text⟧ ishtmlbody ⟦bool⟧ attachments ⟦list⟧
+mail.smtp host ⟦text⟧ port ⟦integer⟧ login ⟦text⟧ password ⟦text⟧ from ⟦text⟧ to ⟦text⟧ cc ⟦text⟧ bcc ⟦text⟧ subject ⟦text⟧ body ⟦text⟧ ishtmlbody ⟦bool⟧ attachments ⟦list⟧ ignorecertificateerrors ⟦bool⟧
 ```
 
 ## Description
@@ -23,6 +23,7 @@ This command sends a mail message from a provided email address to a specified r
 |`subject`| [text](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/TextStructure.md) | no | |Message subject|
 |`body`| [text](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/TextStructure.md) | no|  |Message body, i.e. the main content of an email |
 |`attachments`| [list](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/ListStructure.md) | no |  | List of full paths to all files to be attached |
+| `ignorecertificateerrors` | [bool](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/BooleanStructure.md) | no       | false | If set to `true`, the command will ignore any security certificate errors |
 | `if`           | [bool](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/BooleanStructure.md) | no       | true                                                        | Executes the command only if a specified condition is true   |
 | `timeout`      | [timespan](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/TimeSpanStructure.md) | no       | [♥timeoutmailsmtp](https://manual.g1ant.com/link/G1ANT.Addon/G1ANT.Addon.Net/G1ANT.Addon.Net/Variables/TimeoutMailSmtpVariable.md) | Specifies time in milliseconds for G1ANT.Robot to wait for the command to be executed |
 | `errorcall`    | [procedure](https://manual.g1ant.com/link/G1ANT.Language/G1ANT.Language/Structures/ProcedureStructure.md) | no       |                                                             | Name of a procedure to call when the command throws an exception or when a given `timeout` expires |
