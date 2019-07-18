@@ -35,24 +35,23 @@ namespace G1ANT.Addon.Net
             public VariableStructure Result { get; set; } = new VariableStructure("result");
 
         }
+
         public VncConnectCommand(AbstractScripter scripter) : base(scripter)
         {
         }
-        public string pathToVNC = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName,
-             @"VNC.exe");
-        Process testerApp;
 
         public void Execute(Arguments arguments)
         {
-            string host = arguments.Host.Value;
-            string port = arguments.Port.Value;
-            string pass = arguments.Password.Value;
+            var pathToVNC = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName, @"VNC.exe");
+            var host = arguments.Host.Value;
+            var port = arguments.Port.Value;
+            var pass = arguments.Password.Value;
 
             if (host == string.Empty || port == string.Empty || pass == string.Empty)
                 throw new ApplicationException("Host or port or pass is empty");
 
-            testerApp = System.Diagnostics.Process.Start(pathToVNC, "-Scaling Fit -Encryption Server " + host + " " + port + " " + pass);
-            bool result = RobotWin32.ShowWindow(testerApp.MainWindowHandle, RobotWin32.ShowWindowEnum.ShowNormal);
+            var testerApp = Process.Start(pathToVNC, "-Scaling Fit -Encryption Server " + host + " " + port + " " + pass);
+            var result = RobotWin32.ShowWindow(testerApp.MainWindowHandle, RobotWin32.ShowWindowEnum.ShowNormal);
             Scripter.Variables.SetVariableValue(arguments.Result.Value, new BooleanStructure(result));
         }
     }
