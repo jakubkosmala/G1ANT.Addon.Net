@@ -11,6 +11,7 @@ using G1ANT.Language;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace G1ANT.Addon.Net
 {
@@ -24,25 +25,24 @@ namespace G1ANT.Addon.Net
             public TextStructure Host { get; set; }
 
         }
-        public string pathToTelnet = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName,
-             @"telnet.exe");
-        public string pathToPutty = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName,
-             @"putty.exe");
-        Process putty;
+
         public AS400openCommand(AbstractScripter scripter) : base(scripter)
         {
         }
+
         public void Execute(Arguments arguments)
         {
-            string errorJump = arguments.ErrorJump != null && arguments.ErrorJump != null ? arguments.ErrorJump.ToString() : string.Empty;
-            string host = arguments.Host.Value;
+            var pathToTelnet = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName, @"telnet.exe");
+            var pathToPutty = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName, @"putty.exe");
+            var errorJump = arguments.ErrorJump != null && arguments.ErrorJump != null ? arguments.ErrorJump.ToString() : string.Empty;
+            var host = arguments.Host.Value;
             //telnet = System.Diagnostics.Process.Start(pathToTelnet, host);
-            putty = System.Diagnostics.Process.Start(pathToPutty, "-load AS400");
-            System.Threading.Thread.Sleep(2000);
+            var putty = Process.Start(pathToPutty, "-load AS400");
+            Thread.Sleep(2000);
             //RobotWin32.ShowWindow(telnet.MainWindowHandle, RobotWin32.ShowWindowEnum.ShowNormal);          
             //IntPtr iHandle = RobotWin32.FindWindow(null, telnet.MainWindowTitle);
             RobotWin32.ShowWindow(putty.MainWindowHandle, RobotWin32.ShowWindowEnum.ShowNormal);
-            IntPtr iHandle = RobotWin32.FindWindow(null, putty.MainWindowTitle);
+            var iHandle = RobotWin32.FindWindow(null, putty.MainWindowTitle);
             RobotWin32.SetForegroundWindow(iHandle);
         }
     }
