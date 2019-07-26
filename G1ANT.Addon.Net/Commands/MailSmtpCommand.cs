@@ -11,6 +11,7 @@ using System.Text;
 using System.Net.Mail;
 using G1ANT.Language;
 using System.Linq;
+using System.Net;
 
 namespace G1ANT.Addon.Net
 {
@@ -55,6 +56,9 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "List of full paths to all files to be attached")]
             public ListStructure Attachments { get; set; }
 
+            [Argument(Required = false, Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
+            public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
+
             [Argument(DefaultVariable = "timeoutmailsmtp", Tooltip = "Specifies time in milliseconds for G1ANT.Robot to wait for the command to be executed")]
             public override TimeSpanStructure Timeout { get; set; }
         }
@@ -63,6 +67,11 @@ namespace G1ANT.Addon.Net
         }
         public void Execute(Arguments arguments)
         {
+            if (arguments.IgnoreCertificateErrors.Value)
+            {
+                ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            }
+
             SmtpClient client = new SmtpClient();
 
             client.EnableSsl = true;
