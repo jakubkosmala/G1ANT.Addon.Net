@@ -11,11 +11,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MailKit;
-using MailKit.Net.Imap;
+using System.Net;
 using G1ANT.Language;
 using G1ANT.Language.Models;
-using System.Net;
+using MailKit;
 using MailKit.Search;
 
 namespace G1ANT.Addon.Net
@@ -117,6 +116,7 @@ namespace G1ANT.Addon.Net
             IEnumerable<BodyPartBasic> attachments)
         {
             ListStructure attachmentsList = new ListStructure();
+
             foreach (var attachment in attachments)
             {
                 AttachmentModel attachmentModel = new AttachmentModel(attachment, folder, message);
@@ -132,14 +132,11 @@ namespace G1ANT.Addon.Net
                           MessageSummaryItems.Body |
                           MessageSummaryItems.BodyStructure |
                           MessageSummaryItems.UniqueId;
-            var query = SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
-            var uids = folder.Search(query);
-            var allMessages = folder.Fetch(uids, options).ToList();
-            var onlyUnread = arguments.OnlyUnreadMessages.Value;
-            var since = arguments.SinceDate.Value;
-            var to = arguments.ToDate.Value;
 
-            return SelectMessages(allMessages, onlyUnread, since, to);
+            var query = CreateSearchQuery(arguments);
+            var uids = folder.Search(query);
+
+            return folder.Fetch(uids, options).ToList();
         }
 
         private static void MarkMessagesAsRead(IMailFolder folder, List<IMessageSummary> messages)
@@ -150,13 +147,21 @@ namespace G1ANT.Addon.Net
             }
         }
 
-        private static List<IMessageSummary> SelectMessages(
-        IList<IMessageSummary> messages, bool onlyUnRead, DateTime sinceDate, DateTime toDate)
+        private static SearchQuery CreateSearchQuery(Arguments arguments)
         {
-            Func<IMessageSummary, bool> isUnread = m => m.Flags != null && m.Flags.Value.HasFlag(MessageFlags.Seen) == false;
-            var relevantMessages = messages.Where(m => m.Date >= sinceDate && m.Date <= toDate).ToList();
-            relevantMessages = onlyUnRead ? relevantMessages.Where(isUnread).ToList() : relevantMessages;
-            return relevantMessages;
+            var query = SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+
+            if (arguments.OnlyUnreadMessages.Value)
+            {
+                query.And(SearchQuery.NotSeen);
+            }
+
+            if (arguments.OnlyUnreadMessages.Value)
+            {
+                query.And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
+            }
+
+            return query;
         }
     }
 }
