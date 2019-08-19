@@ -7,19 +7,41 @@ namespace G1ANT.Addon.Net
 {
     public static class ImapHelper
     {
-        private static void ConnectClient(ImapClient client, NetworkCredential credentials, Uri uri, bool readOnly)
+        private static NetworkCredential _credentials;
+        private static ImapClient _client;
+        private static Uri _uri;
+
+        private static void ConnectClient(ImapClient client)
         {
-            client.Connect(uri);
-            client.Authenticate(credentials);
-            client.Inbox.Open(readOnly ? FolderAccess.ReadOnly : FolderAccess.ReadWrite);
+            client.Connect(_uri);
+            client.Authenticate(_credentials);
+            client.Inbox.Open(FolderAccess.ReadWrite);
             client.Inbox.Subscribe();
         }
 
-        public static ImapClient CreateImapClient(NetworkCredential credentials, Uri uri, bool readOnly, int timeout)
+        public static void DisconnectClient()
+        {
+            _client.Disconnect(true);
+        }
+
+        public static ImapClient CreateImapClient(NetworkCredential credentials, Uri uri, int timeout)
         {
             var client = new ImapClient {Timeout = timeout};
-            ConnectClient(client, credentials, uri, readOnly);
-            return client;
+            _credentials = credentials;
+            _client = client;
+            _uri = uri;
+            ConnectClient(_client);
+            return _client;
+        }
+
+        public static ImapClient GetClient()
+        {
+            return _client;
+        }
+
+        public static void Reconnect()
+        {
+            ConnectClient(_client);
         }
     }
 }

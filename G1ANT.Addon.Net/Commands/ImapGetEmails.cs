@@ -1,4 +1,4 @@
-/**
+﻿/**
 *    Copyright(C) G1ANT Ltd, All rights reserved
 *    Solution G1ANT.Addon, Project G1ANT.Addon.Net
 *    www.g1ant.com
@@ -7,34 +7,23 @@
 *    See License.txt file in the project root for full license information.
 *
 */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MailKit;
+using System.Net;
 using G1ANT.Language;
 using G1ANT.Language.Models;
-using System.Net;
-
+using MailKit;
+using MailKit.Search;
 
 namespace G1ANT.Addon.Net
 {
-    [Command(Name = "mail.imap", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
-    public class MailImapCommand : Command
+    [Command(Name = "imap.getmails", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
+    public class ImapGetMails : Command
     {
         public class Arguments : CommandArguments
         {
-            [Argument(Required = true, Tooltip = "IMAP server address")]
-            public TextStructure Host { get; set; }
-
-            [Argument(Required = true, Tooltip = "IMAP server port number")]
-            public IntegerStructure Port { get; set; } = new IntegerStructure(993);
-
-            [Argument(Required = true, Tooltip = "User email login")]
-            public TextStructure Login { get; set; }
-
-            [Argument(Required = true, Tooltip = "User email password")]
-            public TextStructure Password { get; set; }
-
             [Argument(Required = true, Tooltip = "Folder to fetch emails from")]
             public TextStructure Folder { get; set; } = new TextStructure("INBOX");
 
@@ -58,27 +47,20 @@ namespace G1ANT.Addon.Net
         }
 
 
-        public MailImapCommand(AbstractScripter scripter) : base(scripter)
+        public ImapGetMails(AbstractScripter scripter) : base(scripter)
         { }
 
 
         public void Execute(Arguments arguments)
         {
-            if (arguments.IgnoreCertificateErrors.Value)
-            {
-                ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-            }
-            var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
-            var uri = new UriBuilder("imaps", arguments.Host.Value, arguments.Port.Value).Uri;
-            var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
             var markAllMessagesAsRead = arguments.MarkAsRead.Value;
 
-            var client = ImapHelper.CreateImapClient(credentials, uri, timeout);
+            var client = ImapHelper.GetClient();
 
             if (client.IsConnected && client.IsAuthenticated)
             {
                 var folder = client.GetFolder(arguments.Folder.Value);
-                folder.Open(FolderAccess.ReadOnly);
+                folder.Open(FolderAccess.ReadWrite);
                 var messages = ReceiveMesssages(folder, arguments);
                 SendMessageListToScripter(folder, arguments, messages);
 
@@ -100,7 +82,7 @@ namespace G1ANT.Addon.Net
             var messageList = new ListStructure();
             foreach (var message in messages)
             {
-                var attachments = CreateAttachmentStructuresFromAttachments(message,folder,message.Attachments);
+                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.Attachments);
                 var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder, attachments);
                 var structure = new MailStructure(messageWithFolder, null, null);
                 messageList.AddItem(structure);
@@ -108,10 +90,11 @@ namespace G1ANT.Addon.Net
             return messageList;
         }
 
-        private ListStructure CreateAttachmentStructuresFromAttachments (IMessageSummary message,IMailFolder folder, 
+        private ListStructure CreateAttachmentStructuresFromAttachments(IMessageSummary message, IMailFolder folder,
             IEnumerable<BodyPartBasic> attachments)
         {
             ListStructure attachmentsList = new ListStructure();
+
             foreach (var attachment in attachments)
             {
                 AttachmentModel attachmentModel = new AttachmentModel(attachment, folder, message);
@@ -127,12 +110,11 @@ namespace G1ANT.Addon.Net
                           MessageSummaryItems.Body |
                           MessageSummaryItems.BodyStructure |
                           MessageSummaryItems.UniqueId;
-            var allMessages = folder.Fetch(0, -1, options).ToList();
-            var onlyUnread = arguments.OnlyUnreadMessages.Value;
-            var since = arguments.SinceDate.Value;
-            var to = arguments.ToDate.Value;
 
-            return SelectMessages(allMessages, onlyUnread, since, to);
+            var query = CreateSearchQuery(arguments);
+            var uids = folder.Search(query);
+
+            return folder.Fetch(uids, options).ToList();
         }
 
         private static void MarkMessagesAsRead(IMailFolder folder, List<IMessageSummary> messages)
@@ -143,13 +125,21 @@ namespace G1ANT.Addon.Net
             }
         }
 
-        private static List<IMessageSummary> SelectMessages(
-        IList<IMessageSummary> messages, bool onlyUnRead, DateTime sinceDate, DateTime toDate)
+        private static SearchQuery CreateSearchQuery(Arguments arguments)
         {
-            Func<IMessageSummary, bool> isUnread = m => m.Flags != null && m.Flags.Value.HasFlag(MessageFlags.Seen) == false;
-            var relevantMessages = messages.Where(m => m.Date >= sinceDate && m.Date <= toDate).ToList();
-            relevantMessages = onlyUnRead ? relevantMessages.Where(isUnread).ToList() : relevantMessages;
-            return relevantMessages;
+            var query = SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+
+            if (arguments.OnlyUnreadMessages.Value)
+            {
+                query.And(SearchQuery.NotSeen);
+            }
+
+            if (arguments.OnlyUnreadMessages.Value)
+            {
+                query.And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
+            }
+
+            return query;
         }
     }
 }
