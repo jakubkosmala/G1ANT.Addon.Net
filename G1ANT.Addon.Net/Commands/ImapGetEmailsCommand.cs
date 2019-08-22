@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using G1ANT.Language;
 using G1ANT.Language.Models;
 using MailKit;
@@ -20,14 +19,20 @@ using MailKit.Search;
 namespace G1ANT.Addon.Net
 {
     [Command(Name = "imap.getmails", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
-    public class ImapGetMails : Command
+    public class ImapGetMailsCommand : Command
     {
         public class Arguments : CommandArguments
         {
             [Argument(Required = true, Tooltip = "Folder to fetch emails from")]
             public TextStructure Folder { get; set; } = new TextStructure("INBOX");
 
-            [Argument(Required = true, Tooltip = "Starting date for messages to be checked")]
+            [Argument(Required = true, Tooltip = "How many emails to download")]
+            public IntegerStructure Count { get; set; } = new IntegerStructure(50);
+
+            [Argument(Required = false, Tooltip = "Start downloading emails newer than a specified one")]
+            public SimplifiedMessageSummary FromEmail { get; set; }
+
+            [Argument(Required = false, Tooltip = "Starting date for messages to be checked")]
             public DateStructure SinceDate { get; set; }
 
             [Argument(Required = false, Tooltip = "Ending date for messages to be checked")]
@@ -41,15 +46,10 @@ namespace G1ANT.Addon.Net
 
             [Argument(Required = false, Tooltip = "Name of a list variable where the returned mail variables will be stored")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
-
-            [Argument(Required = false, Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
-            public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
         }
 
-
-        public ImapGetMails(AbstractScripter scripter) : base(scripter)
+        public ImapGetMailsCommand(AbstractScripter scripter) : base(scripter)
         { }
-
 
         public void Execute(Arguments arguments)
         {
@@ -68,6 +68,10 @@ namespace G1ANT.Addon.Net
                 {
                     MarkMessagesAsRead(folder, messages);
                 }
+            }
+            else
+            {
+                throw new Exception("Could not connect or authenticate on the server");
             }
         }
 
@@ -112,7 +116,19 @@ namespace G1ANT.Addon.Net
                           MessageSummaryItems.UniqueId;
 
             var query = CreateSearchQuery(arguments);
-            var uids = folder.Search(query);
+            var uids = folder.Search(query).ToList();
+
+            if (arguments.FromEmail != null)
+            {
+                var fromMailIndex = uids.FindIndex(u => u == arguments.FromEmail.UniqueId);
+
+                uids.RemoveRange(fromMailIndex, uids.Count - fromMailIndex);
+            }
+
+            if (uids.Count > arguments.Count.Value)
+            {
+                uids.RemoveRange(arguments.Count.Value, uids.Count - arguments.Count.Value);
+            }
 
             return folder.Fetch(uids, options).ToList();
         }
@@ -127,7 +143,12 @@ namespace G1ANT.Addon.Net
 
         private static SearchQuery CreateSearchQuery(Arguments arguments)
         {
-            var query = SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+            var query = new SearchQuery();
+
+            if (arguments.SinceDate != null)
+            {
+                SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+            }
 
             if (arguments.OnlyUnreadMessages.Value)
             {

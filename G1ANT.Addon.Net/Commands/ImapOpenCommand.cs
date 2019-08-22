@@ -14,7 +14,7 @@ using System.Net;
 
 namespace G1ANT.Addon.Net
 {
-    [Command(Name = "mail.imap", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
+    [Command(Name = "imap.open", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
     public class ImapOpenCommand : Command
     {
         public class Arguments : CommandArguments
@@ -48,7 +48,7 @@ namespace G1ANT.Addon.Net
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
             var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
-            var uri = new UriBuilder(arguments.UseSsl.Value ? "imap" : "imaps", arguments.Host.Value, arguments.Port.Value).Uri;
+            var uri = new UriBuilder(arguments.UseSsl.Value ? "imaps" : "imap", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
 
             ImapHelper.CreateImapClient(credentials, uri, timeout);

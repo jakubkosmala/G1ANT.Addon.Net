@@ -73,7 +73,7 @@
   <ItemGroup>
     <Compile Include="Commands\AS400OpenCommand.cs" />
     <Compile Include="Commands\ImapCloseCommand.cs" />
-    <Compile Include="Commands\ImapGetEmails.cs" />
+    <Compile Include="Commands\ImapGetEmailsCommand.cs" />
     <Compile Include="Commands\ImapOpenCommand.cs" />
     <Compile Include="Commands\ImapReconnectCommand.cs" />
     <Compile Include="Commands\IsAccessibleCommand.cs" />
