@@ -1,7 +1,4 @@
-﻿
-
-using G1ANT.Language;
-/**
+﻿/**
 *    Copyright(C) G1ANT Ltd, All rights reserved
 *    Solution G1ANT.Addon, Project G1ANT.Addon.Net
 *    www.g1ant.com
@@ -10,9 +7,12 @@ using G1ANT.Language;
 *    See License.txt file in the project root for full license information.
 *
 */
+
+using G1ANT.Language;
+
 namespace G1ANT.Addon.Net
 {
-    [Command(Name = "imap.close", Tooltip = "This command closes imap connection to mail server")]
+    [Command(Name = "imap.close", Tooltip = "This command closes IMAP connection to mail server")]
     public class ImapCloseCommand : Command
     {
         public class Arguments : CommandArguments
@@ -27,5 +27,3 @@ namespace G1ANT.Addon.Net
         }
     }
 }
-
-

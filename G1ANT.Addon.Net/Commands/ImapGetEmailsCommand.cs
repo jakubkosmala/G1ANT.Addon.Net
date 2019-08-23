@@ -23,10 +23,10 @@ namespace G1ANT.Addon.Net
     {
         public class Arguments : CommandArguments
         {
-            [Argument(Required = true, Tooltip = "Folder to fetch emails from")]
+            [Argument(Tooltip = "Folder to fetch emails from")]
             public TextStructure Folder { get; set; } = new TextStructure("INBOX");
 
-            [Argument(Required = true, Tooltip = "How many emails to download")]
+            [Argument(Tooltip = "How many emails to download")]
             public IntegerStructure Count { get; set; } = new IntegerStructure(50);
 
             [Argument(Required = false, Tooltip = "Start downloading emails newer than a specified one")]
@@ -35,13 +35,13 @@ namespace G1ANT.Addon.Net
             [Argument(Required = false, Tooltip = "Starting date for messages to be checked")]
             public DateStructure SinceDate { get; set; }
 
-            [Argument(Required = false, Tooltip = "Ending date for messages to be checked")]
+            [Argument(Tooltip = "Ending date for messages to be checked")]
             public DateStructure ToDate { get; set; } = new DateStructure(DateTime.Now);
 
             [Argument(Required = false, Tooltip = "If set to `true`, only unread messages will be checked")]
             public BooleanStructure OnlyUnreadMessages { get; set; } = new BooleanStructure(false);
 
-            [Argument(Required = false, Tooltip = "Mark analyzed messages as read")]
+            [Argument(Required = false, Tooltip = "Mark processed messages as read")]
             public BooleanStructure MarkAsRead { get; set; } = new BooleanStructure(true);
 
             [Argument(Required = false, Tooltip = "Name of a list variable where the returned mail variables will be stored")]

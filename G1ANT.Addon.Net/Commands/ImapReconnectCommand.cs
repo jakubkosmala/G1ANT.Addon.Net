@@ -12,7 +12,7 @@ using G1ANT.Language;
 */
 namespace G1ANT.Addon.Net
 {
-    [Command(Name = "imap.reconnect", Tooltip = "This command restores imap connection to mail server")]
+    [Command(Name = "imap.reconnect", Tooltip = "This command restores IMAP connection to mail server")]
     public class ImapReconnectCommand : Command
     {
         public class Arguments : CommandArguments

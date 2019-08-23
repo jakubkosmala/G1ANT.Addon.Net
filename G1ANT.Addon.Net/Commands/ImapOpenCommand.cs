@@ -22,10 +22,10 @@ namespace G1ANT.Addon.Net
             [Argument(Required = true, Tooltip = "IMAP server address")]
             public TextStructure Host { get; set; }
 
-            [Argument(Required = true, Tooltip = "IMAP server port number")]
+            [Argument(Tooltip = "IMAP server port number")]
             public IntegerStructure Port { get; set; } = new IntegerStructure(993);
 
-            [Argument(Required = true, Tooltip = "IMAP server port number")]
+            [Argument(Tooltip = "IMAP server port number")]
             public BooleanStructure UseSsl { get; set; } = new BooleanStructure(true);
 
             [Argument(Required = true, Tooltip = "User login")]
@@ -34,7 +34,7 @@ namespace G1ANT.Addon.Net
             [Argument(Required = true, Tooltip = "User password")]
             public TextStructure Password { get; set; }
 
-            [Argument(Required = false, Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
+            [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
             public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
         }
 
