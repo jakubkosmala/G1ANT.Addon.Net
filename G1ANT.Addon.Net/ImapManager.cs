@@ -7,58 +7,58 @@ namespace G1ANT.Addon.Net
 {
     public sealed class ImapManager
     {
-        private static ImapManager _instance = null;
-        private static readonly object _padLock = new object();
-        private NetworkCredential _credentials;
-        private ImapClient _client;
-        private Uri _uri;
+        private static ImapManager instance = null;
+        private static readonly object padLock = new object();
+        private NetworkCredential credentials;
+        private ImapClient client;
+        private Uri uri;
 
         public static ImapManager Instance
         {
             get
             {
-                lock (_padLock)
+                lock (padLock)
                 {
-                    if (_instance == null)
+                    if (instance == null)
                     {
-                        _instance = new ImapManager();
+                        instance = new ImapManager();
                     }
-                    return _instance;
+                    return instance;
                 }
             }
         }
 
         private void ConnectClient(ImapClient client)
         {
-            client.Connect(_uri);
-            client.Authenticate(_credentials);
+            client.Connect(uri);
+            client.Authenticate(credentials);
             client.Inbox.Open(FolderAccess.ReadWrite);
             client.Inbox.Subscribe();
         }
 
         public void DisconnectClient()
         {
-            _client.Disconnect(true);
+            client.Disconnect(true);
         }
 
         public ImapClient CreateImapClient(NetworkCredential credentials, Uri uri, int timeout)
         {
             var client = new ImapClient { Timeout = timeout };
-            _credentials = credentials;
-            _client = client;
-            _uri = uri;
-            ConnectClient(_client);
-            return _client;
+            this.credentials = credentials;
+            this.client = client;
+            this.uri = uri;
+            ConnectClient(this.client);
+            return this.client;
         }
 
         public ImapClient GetClient()
         {
-            return _client;
+            return client;
         }
 
         public void Reconnect()
         {
-            ConnectClient(_client);
+            ConnectClient(client);
         }
     }
 }

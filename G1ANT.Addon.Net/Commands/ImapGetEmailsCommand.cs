@@ -110,10 +110,10 @@ namespace G1ANT.Addon.Net
 
         private List<IMessageSummary> ReceiveMesssages(IMailFolder folder, Arguments arguments)
         {
-            var options = MessageSummaryItems.All |
-                          MessageSummaryItems.Body |
-                          MessageSummaryItems.BodyStructure |
-                          MessageSummaryItems.UniqueId;
+            var options = MessageSummaryItems.All
+                | MessageSummaryItems.Body
+                | MessageSummaryItems.BodyStructure
+                | MessageSummaryItems.UniqueId;
 
             var query = CreateSearchQuery(arguments);
             var uids = folder.Search(query).ToList();
