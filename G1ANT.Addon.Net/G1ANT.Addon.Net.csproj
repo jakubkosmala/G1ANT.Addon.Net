@@ -72,13 +72,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AS400OpenCommand.cs" />
+    <Compile Include="Commands\ImapCloseCommand.cs" />
+    <Compile Include="Commands\ImapGetEmailsCommand.cs" />
+    <Compile Include="Commands\ImapOpenCommand.cs" />
+    <Compile Include="Commands\ImapReconnectCommand.cs" />
     <Compile Include="Commands\IsAccessibleCommand.cs" />
     <Compile Include="Commands\MailMoveToCommand.cs" />
     <Compile Include="Commands\MailImapCommand.cs" />
     <Compile Include="Commands\MailSmtpCommand.cs" />
     <Compile Include="Commands\PingCommand.cs" />
     <Compile Include="Commands\RestCommand.cs" />
-    <Compile Include="ImapHelper.cs" />
+    <Compile Include="ImapManager.cs" />
     <Compile Include="Variables\TimeoutMailSmtpVariable.cs" />
     <Compile Include="Variables\TimeoutRemoteDesktopVariable.cs" />
     <Compile Include="Variables\TimeoutConnectVariable.cs" />

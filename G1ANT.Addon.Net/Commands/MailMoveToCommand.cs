@@ -97,7 +97,7 @@ namespace G1ANT.Addon.Net
             var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
             var uri = new UriBuilder("imaps", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            return ImapHelper.CreateImapClient(credentials, uri, false, timeout);
+            return ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
         }
 
         private void SetCertificateValidationCallback(bool ignoreCertificateErrors)
