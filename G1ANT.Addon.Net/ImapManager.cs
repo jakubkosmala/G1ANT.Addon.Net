@@ -7,26 +7,11 @@ namespace G1ANT.Addon.Net
 {
     public sealed class ImapManager
     {
-        private static ImapManager instance = null;
-        private static readonly object padLock = new object();
         private NetworkCredential credentials;
         private ImapClient client;
         private Uri uri;
 
-        public static ImapManager Instance
-        {
-            get
-            {
-                lock (padLock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new ImapManager();
-                    }
-                    return instance;
-                }
-            }
-        }
+        public static ImapManager Instance { get; } = new ImapManager();
 
         private void ConnectClient(ImapClient client)
         {
