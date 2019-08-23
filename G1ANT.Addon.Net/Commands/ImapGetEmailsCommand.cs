@@ -32,7 +32,7 @@ namespace G1ANT.Addon.Net
             [Argument(Required = false, Tooltip = "Start downloading emails newer than a specified one")]
             public SimplifiedMessageSummary FromEmail { get; set; }
 
-            [Argument(Required = false, Tooltip = "Starting date for messages to be checked")]
+            [Argument(Required = false, Tooltip = "Start date for messages to be checked")]
             public DateStructure SinceDate { get; set; }
 
             [Argument(Tooltip = "Ending date for messages to be checked")]
@@ -55,7 +55,7 @@ namespace G1ANT.Addon.Net
         {
             var markAllMessagesAsRead = arguments.MarkAsRead.Value;
 
-            var client = ImapHelper.GetClient();
+            var client = ImapManager.Instance.GetClient();
 
             if (client.IsConnected && client.IsAuthenticated)
             {

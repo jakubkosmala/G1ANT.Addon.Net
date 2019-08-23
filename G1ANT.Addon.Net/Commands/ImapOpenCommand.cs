@@ -51,7 +51,7 @@ namespace G1ANT.Addon.Net
             var uri = new UriBuilder(arguments.UseSsl.Value ? "imaps" : "imap", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
 
-            ImapHelper.CreateImapClient(credentials, uri, timeout);
+            ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
         }
     }
 }

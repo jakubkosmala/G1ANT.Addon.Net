@@ -23,7 +23,7 @@ namespace G1ANT.Addon.Net
 
         public void Execute(Arguments arguments)
         {
-            ImapHelper.DisconnectClient();
+            ImapManager.Instance.DisconnectClient();
         }
     }
 }
