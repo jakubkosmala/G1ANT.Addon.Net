@@ -122,7 +122,7 @@ namespace G1ANT.Addon.Net
             {
                 var fromMailIndex = uids.FindIndex(u => u == arguments.FromEmail.UniqueId);
 
-                uids.RemoveRange(fromMailIndex, uids.Count - fromMailIndex);
+                uids.RemoveRange(0, fromMailIndex);
             }
 
             if (uids.Count > arguments.Count.Value)
@@ -155,7 +155,7 @@ namespace G1ANT.Addon.Net
                 query.And(SearchQuery.NotSeen);
             }
 
-            if (arguments.OnlyUnreadMessages.Value)
+            if (arguments.ToDate.Value != null)
             {
                 query.And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
             }
