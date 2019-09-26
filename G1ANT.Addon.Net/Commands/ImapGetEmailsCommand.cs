@@ -116,7 +116,8 @@ namespace G1ANT.Addon.Net
                 | MessageSummaryItems.UniqueId;
 
             var query = CreateSearchQuery(arguments);
-            var uids = folder.Search(query).ToList();
+
+            var uids = folder.Search(query).Take(arguments.Count.Value).ToList();
 
             if (arguments.FromEmail != null)
             {
@@ -143,24 +144,10 @@ namespace G1ANT.Addon.Net
 
         private static SearchQuery CreateSearchQuery(Arguments arguments)
         {
-            var query = new SearchQuery();
-
-            if (arguments.SinceDate != null)
-            {
-                query.And(SearchQuery.DeliveredAfter(arguments.SinceDate.Value));
-            }
-
-            if (arguments.OnlyUnreadMessages.Value)
-            {
-                query.And(SearchQuery.NotSeen);
-            }
-
-            if (arguments.ToDate.Value != null)
-            {
-                query.And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
-            }
-
-            return query;
+            return SearchQuery
+                .DeliveredAfter(arguments.SinceDate?.Value ?? DateTime.MinValue)
+                .And(arguments.OnlyUnreadMessages.Value ? SearchQuery.NotSeen : SearchQuery.All)
+                .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
         }
     }
 }
