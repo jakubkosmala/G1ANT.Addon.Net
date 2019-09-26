@@ -116,7 +116,6 @@ namespace G1ANT.Addon.Net
                 | MessageSummaryItems.UniqueId;
 
             var query = CreateSearchQuery(arguments);
-
             var uids = folder.Search(query).Take(arguments.Count.Value).ToList();
 
             if (arguments.FromEmail != null)
