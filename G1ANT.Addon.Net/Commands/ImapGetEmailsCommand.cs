@@ -147,7 +147,7 @@ namespace G1ANT.Addon.Net
 
             if (arguments.SinceDate != null)
             {
-                SearchQuery.DeliveredAfter(arguments.SinceDate.Value);
+                query.And(SearchQuery.DeliveredAfter(arguments.SinceDate.Value));
             }
 
             if (arguments.OnlyUnreadMessages.Value)
