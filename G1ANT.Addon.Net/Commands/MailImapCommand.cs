@@ -7,12 +7,10 @@
 *    See License.txt file in the project root for full license information.
 *
 */
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using MailKit;
-using MailKit.Net.Imap;
 using G1ANT.Language;
 using G1ANT.Language.Models;
 using System.Net;
@@ -75,7 +73,7 @@ namespace G1ANT.Addon.Net
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
             var markAllMessagesAsRead = arguments.MarkAsRead.Value;
 
-            var client = ImapHelper.CreateImapClient(credentials, uri, !markAllMessagesAsRead, timeout);
+            var client = ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
 
             if (client.IsConnected && client.IsAuthenticated)
             {

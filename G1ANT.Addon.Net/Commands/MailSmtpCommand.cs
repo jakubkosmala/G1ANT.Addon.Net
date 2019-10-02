@@ -12,6 +12,7 @@ using System.Net.Mail;
 
 using G1ANT.Language;
 using System.Linq;
+using System.Net;
 
 namespace G1ANT.Addon.Net
 {
@@ -58,14 +59,21 @@ namespace G1ANT.Addon.Net
 
             [Argument(DefaultVariable = "timeoutmailsmtp", Tooltip = "Specifies time in milliseconds for G1ANT.Robot to wait for the command to be executed")]
             public override TimeSpanStructure Timeout { get; set; }
+
+            [Argument(Required = false, Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
+            public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
         }
         public MailSmtpCommand(AbstractScripter scripter) : base(scripter)
         {
         }
         public void Execute(Arguments arguments)
         {
-            SmtpClient client = new SmtpClient();
+            if (arguments.IgnoreCertificateErrors.Value)
+            {
+                ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            }
 
+            var client = new SmtpClient();
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
