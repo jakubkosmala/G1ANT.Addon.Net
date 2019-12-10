@@ -1,5 +1,12 @@
+using G1ANT.Language;
+using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
 /**
-*    Copyright(C) G1ANT Ltd, All rights reserved
+*    Copyright (c) G1ANT Robot Ltd, All rights reserved
 *    Solution G1ANT.Addon, Project G1ANT.Addon.Net
 *    www.g1ant.com
 *
@@ -7,11 +14,6 @@
 *    See License.txt file in the project root for full license information.
 *
 */
-using System;
-using RestSharp;
-
-using G1ANT.Language;
-
 namespace G1ANT.Addon.Net
 {
     [Command(Name = "rest", Tooltip = "This command prepares a request to a desired URL with a selected method")]
@@ -26,88 +28,167 @@ namespace G1ANT.Addon.Net
             public TextStructure Url { get; set; }
 
             [Argument(DefaultVariable = "timeoutrest", Tooltip = "Specifies time in milliseconds for G1ANT.Robot to wait for the command to be executed")]
-            public  override TimeSpanStructure Timeout { get; set; }
+            public override TimeSpanStructure Timeout { get; set; }
 
             [Argument(Tooltip = "Headers attached to the request. Separate headers using ❚ character (Ctrl+\\); their keys and values should be separated with colon (:)")]
             public ListStructure Headers { get; set; }
 
-            [Argument(Tooltip = "Parameters attached to the request. Separate headers using ❚ character (Ctrl+\\); their keys and values should be separated with colon (:)")]
+            [Argument(Tooltip = "Parameters attached to the request. Separate parameters using ❚ character (Ctrl+\\); their keys and values should be separated with colon (:). Use key name RequestBody to send parameter value as request body")]
             public ListStructure Parameters { get; set; }
+
+            [Argument(Tooltip = "Files attached to the request. Separate files from path using ❚ character (Ctrl+\\); their keys, values and content type should be separated with asterisk (*). Use key name RequestBody to send file as request body")]
+            public ListStructure Files { get; set; }
+
+            [Argument(Tooltip = "File path to be sent as request body. Shorthand for sending file as body using \"Files\" argument with key name \"RequestBody\". Content-type can be set after asterisk (*)")]
+            public TextStructure BodyFile { get; set; }
 
             [Argument(Tooltip = "Name of a variable which will store the data returned by the API (usually json or xml)")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
 
             [Argument(Tooltip = "Name of a variable which will store the request delivery status")]
             public VariableStructure Status { get; set; } = new VariableStructure("status");
+
+            [Argument(Tooltip = "Name of a variable which will store the response status code")]
+            public IntegerStructure StatusCode { get; set; } = new IntegerStructure();
         }
-        public RestCommand(AbstractScripter scripter) : base(scripter)
+
+        private class PostFileModel
         {
+            public string FormFieldName { get; }
+            public string FilePath { get; }
+            public string ContentType { get; }
+
+            public PostFileModel(string data)
+            {
+                var separatedData = data.Split(FileKeyValueSeparator);
+
+                if (separatedData.Length < 2)
+                    throw new FormatException($"Missing separator in [{data}], use [{FileKeyValueSeparator}] instead");
+
+                FormFieldName = separatedData[0];
+                FilePath = separatedData[1];
+                ContentType = separatedData.Length > 2 ? separatedData[2] : null;
+            }
+
+            public PostFileModel(string formFieldName, string filePath, string contentType)
+            {
+                FormFieldName = formFieldName;
+
+                if (filePath.Contains(FileKeyValueSeparator))
+                {
+                    var splittedPath = filePath.Split(FileKeyValueSeparator);
+                    filePath = splittedPath[0];
+                    contentType = splittedPath[1];
+                }
+
+                FilePath = filePath;
+                ContentType = contentType;
+            }
         }
+
+
+        private const char KeyValueSeparator = ':';
+        private const char FileKeyValueSeparator = '*';
+
+        public RestCommand(AbstractScripter scripter) : base(scripter)
+        { }
+
         public void Execute(Arguments arguments)
         {
-            RestClient client = new RestClient(arguments.Url.Value)
+            var client = new RestClient(arguments.Url.Value)
             {
-                Timeout = Convert.ToInt32((int)arguments.Timeout.Value.TotalMilliseconds)
+                Timeout = (int)arguments.Timeout.Value.TotalMilliseconds
             };
 
-            string method = arguments.Method.Value;
-            Method currentMethod = ParseRestMethod(method);
+            var method = arguments.Method.Value;
+            var currentMethod = ParseRestMethod(method);
 
-            RestRequest request = new RestRequest(string.Empty, currentMethod);
+            var request = new RestRequest(string.Empty, currentMethod);
 
-            char separator = ':';
+            AddRequestData(request, arguments.Headers, true);
+            AddRequestData(request, arguments.Parameters, false);
+            AddRequestFiles(request, arguments.Files, arguments.BodyFile);
 
-            AddRequestData(request, arguments.Headers, separator, true);
-            AddRequestData(request, arguments.Parameters, separator, false);
+            var response = client.Execute(request);
 
-            IRestResponse response = client.Execute(request);
-            string content = response.Content;
+            var content = response.Content;
             if (response.ResponseStatus == ResponseStatus.TimedOut)
             {
                 throw new TimeoutException("Request Timed Out");
             }
-            Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
-            Scripter.Variables.SetVariableValue(arguments.Status.Value, new TextStructure(response.ResponseStatus.ToString()));
+
+            Scripter.Variables.SetVariableValue(nameof(Arguments.Result), new TextStructure(content));
+            Scripter.Variables.SetVariableValue(nameof(Arguments.Status), new TextStructure(response.ResponseStatus.ToString()));
+            Scripter.Variables.SetVariableValue(nameof(Arguments.StatusCode), new IntegerStructure((int)response.StatusCode));
+        }
+
+        private void AddRequestFiles(RestRequest request, ListStructure files, TextStructure bodyFile)
+        {
+            var allFiles = new List<PostFileModel>();
+            if (bodyFile?.Value != null)
+                allFiles.Add(new PostFileModel(ParameterType.RequestBody.ToString(), bodyFile.Value.ToString(), null));
+            if (files != null)
+                allFiles.AddRange(files.Value.Select(v => new PostFileModel(v.ToString())));
+
+            foreach (var file in allFiles)
+            {
+                if (file.FormFieldName == ParameterType.RequestBody.ToString())
+                    AddBodyFileName(request, file);
+                else
+                    request.AddFile(file.FormFieldName, file.FilePath, file.ContentType);
+            }
+        }
+
+        private static void AddBodyFileName(RestRequest request, PostFileModel file)
+        {
+            if (file.ContentType != null)
+                request.AddHeader("Content-Type", file.ContentType);
+
+            request.AddHeader("Content-Disposition", string.Format("file; filename=\"{0}\";", Path.GetFileName(file.FilePath)));
+            request.AddParameter("", File.ReadAllBytes(file.FilePath), ParameterType.RequestBody);
         }
 
         private Method ParseRestMethod(string method)
         {
-            Method currentMethod = Method.GET;
             try
             {
-                currentMethod = (Method)Enum.Parse(typeof(Method), method, true);
+                return (Method)Enum.Parse(typeof(Method), method, true);
             }
             catch
             {
                 throw new NotSupportedException($"Given method [{method}] is not supported in rest");
             }
-
-            return currentMethod;
         }
 
-        private void AddRequestData(RestRequest request, ListStructure list, char separator, bool toHeader)
+        private void AddRequestData(RestRequest request, ListStructure list, bool toHeader)
         {
             if (list != null)
             {
                 foreach (var listData in list.Value)
                 {
                     string data = listData.ToString();
-                    var separatedData = data.Split(separator);
+                    var separatedData = data.Split(KeyValueSeparator);
                     if (separatedData.Length != 2)
                     {
-                        throw new FormatException($" Bad separator in [{data}], use [{separator}] instead ");
+                        throw new FormatException($"Missing separator in [{data}], use [{KeyValueSeparator}] instead");
                     }
+                    var name = separatedData[0];
+                    var value = separatedData[1];
 
-                    if (toHeader)
-                    {
-                        request.AddHeader(separatedData[0], separatedData[1]);
-                    }
-                    else
-                    {
-                        request.AddParameter(separatedData[0], separatedData[1]);
-                    }
+                    request.AddParameter(name, value, GetParameterType(toHeader, name));
                 }
             }
+        }
+
+        private static ParameterType GetParameterType(bool toHeader, string name)
+        {
+            if (toHeader)
+                return ParameterType.HttpHeader;
+
+            if (name == ParameterType.RequestBody.ToString())
+                return ParameterType.RequestBody;
+
+            return ParameterType.GetOrPost;
         }
     }
 }
