@@ -42,6 +42,9 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "File path to be sent as request body. Shorthand for sending file as body using \"Files\" argument with key name \"RequestBody\". Content-type can be set after asterisk (*)")]
             public TextStructure BodyFile { get; set; }
 
+            [Argument(Tooltip = "Text to be sent as request body. Shorthand for sending text as body using \"Parameters\" argument with key name \"RequestBody\", but accepts colons as a part of content. Can't set both BodyText and BodyFile")]
+            public TextStructure BodyText { get; set; }
+
             [Argument(Tooltip = "Name of a variable which will store the data returned by the API (usually json or xml)")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
 
@@ -103,10 +106,14 @@ namespace G1ANT.Addon.Net
             var method = arguments.Method.Value;
             var currentMethod = ParseRestMethod(method);
 
+            if (arguments.BodyFile != null && arguments.BodyText != null)
+                throw new ArgumentException("Can't set BodyFile and BodyText at the same time");
+
             var request = new RestRequest(string.Empty, currentMethod);
 
             AddRequestData(request, arguments.Headers, true);
             AddRequestData(request, arguments.Parameters, false);
+            AddRequestBody(request, arguments.BodyText);
             AddRequestFiles(request, arguments.Files, arguments.BodyFile);
 
             var response = client.Execute(request);
@@ -114,12 +121,18 @@ namespace G1ANT.Addon.Net
             var content = response.Content;
             if (response.ResponseStatus == ResponseStatus.TimedOut)
             {
-                throw new TimeoutException("Request Timed Out");
+                throw new TimeoutException("Request timed out");
             }
 
             Scripter.Variables.SetVariableValue(nameof(Arguments.Result), new TextStructure(content));
             Scripter.Variables.SetVariableValue(nameof(Arguments.Status), new TextStructure(response.ResponseStatus.ToString()));
             Scripter.Variables.SetVariableValue(nameof(Arguments.StatusCode), new IntegerStructure((int)response.StatusCode));
+        }
+
+        private void AddRequestBody(RestRequest request, TextStructure bodyText)
+        {
+            if (bodyText?.Value != null)
+                request.AddParameter(ParameterType.RequestBody.ToString(), bodyText.Value, ParameterType.RequestBody);
         }
 
         private void AddRequestFiles(RestRequest request, ListStructure files, TextStructure bodyFile)
@@ -185,7 +198,7 @@ namespace G1ANT.Addon.Net
             if (toHeader)
                 return ParameterType.HttpHeader;
 
-            if (name == ParameterType.RequestBody.ToString())
+            if (name.ToLower() == ParameterType.RequestBody.ToString().ToLower())
                 return ParameterType.RequestBody;
 
             return ParameterType.GetOrPost;
