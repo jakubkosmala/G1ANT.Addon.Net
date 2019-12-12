@@ -52,7 +52,7 @@ namespace G1ANT.Addon.Net
             public VariableStructure Status { get; set; } = new VariableStructure("status");
 
             [Argument(Tooltip = "Name of a variable which will store the response status code")]
-            public IntegerStructure StatusCode { get; set; } = new IntegerStructure();
+            public VariableStructure StatusCode { get; set; } = new VariableStructure("statuscode");
         }
 
         private class PostFileModel
@@ -124,9 +124,9 @@ namespace G1ANT.Addon.Net
                 throw new TimeoutException("Request timed out");
             }
 
-            Scripter.Variables.SetVariableValue(nameof(Arguments.Result), new TextStructure(content));
-            Scripter.Variables.SetVariableValue(nameof(Arguments.Status), new TextStructure(response.ResponseStatus.ToString()));
-            Scripter.Variables.SetVariableValue(nameof(Arguments.StatusCode), new IntegerStructure((int)response.StatusCode));
+            Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
+            Scripter.Variables.SetVariableValue(arguments.Status.Value, new TextStructure(response.ResponseStatus.ToString()));
+            Scripter.Variables.SetVariableValue(arguments.StatusCode.Value, new IntegerStructure((int)response.StatusCode));
         }
 
         private void AddRequestBody(RestRequest request, TextStructure bodyText)
