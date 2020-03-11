@@ -86,7 +86,7 @@ namespace G1ANT.Addon.Net
             var messageList = new ListStructure();
             foreach (var message in messages)
             {
-                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.Attachments);
+                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.BodyParts);
                 var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder, attachments);
                 var structure = new MailStructure(messageWithFolder, null, null);
                 messageList.AddItem(structure);
@@ -99,7 +99,7 @@ namespace G1ANT.Addon.Net
         {
             ListStructure attachmentsList = new ListStructure();
 
-            foreach (var attachment in attachments)
+            foreach (var attachment in attachments.Where(x => !string.IsNullOrEmpty(x.FileName)))
             {
                 AttachmentModel attachmentModel = new AttachmentModel(attachment, folder, message);
                 AttachmentStructure temp = new AttachmentStructure(attachmentModel);
@@ -146,7 +146,7 @@ namespace G1ANT.Addon.Net
             return SearchQuery
                 .DeliveredAfter(arguments.SinceDate?.Value ?? DateTime.MinValue)
                 .And(arguments.OnlyUnreadMessages.Value ? SearchQuery.NotSeen : SearchQuery.All)
-                .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value));
+                .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value).Or(SearchQuery.DeliveredOn(arguments.ToDate.Value)));
         }
     }
 }
