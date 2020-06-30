@@ -43,7 +43,8 @@ namespace G1ANT.Addon.Net
 
         public void Reconnect()
         {
-            ConnectClient(client);
+            if (!client.IsConnected)
+                ConnectClient(client);
         }
     }
 }
