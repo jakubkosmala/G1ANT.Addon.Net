@@ -2,6 +2,7 @@ using System;
 using MailKit;
 using MimeKit;
 using G1ANT.Language;
+using System.Collections.Generic;
 
 namespace G1ANT.Addon.Net
 {
@@ -20,8 +21,6 @@ namespace G1ANT.Addon.Net
         private const string PriorityIndex = "priority";
         private const string AttachmentsIndex = "attachments";
         private const string IsReply = "isreply";
-
-        private MimeMessage FullMessage;
 
         public MailStructure() : base(new MessageSummary(0))
         {
@@ -52,29 +51,30 @@ namespace G1ANT.Addon.Net
             Indexes.Add(PriorityIndex);
             Indexes.Add(BodyIndex);
             Indexes.Add(HtmlBodyIndex);
+            Indexes.Add(IsReply);
         }
 
         public override Structure Get(string index = "")
         {
             if (string.IsNullOrWhiteSpace(index))
             {
-                return new MailStructure(Value.NormalizedSubject, Format);
+                return new MailStructure(Value.Subject, Format);
             }
 
             switch (index.ToLower())
             {
                 case IdIndex:
-                    return new TextStructure(Value.Envelope.MessageId, null, Scripter);
+                    return new TextStructure(Value.MessageId, null, Scripter);
                 case SubjectIndex:
-                    return new TextStructure(Value.NormalizedSubject, null, Scripter);
+                    return new TextStructure(Value.Subject, null, Scripter);
                 case FromIndex:
-                    return new TextStructure(Value.Envelope.From, null, Scripter);
+                    return new TextStructure(Value.From, null, Scripter);
                 case ToIndex:
-                    return new TextStructure(Value.Envelope.To, null, Scripter);
+                    return new TextStructure(Value.To, null, Scripter);
                 case CcIndex:
-                    return new TextStructure(Value.Envelope.Cc, null, Scripter);
+                    return new TextStructure(Value.Cc, null, Scripter);
                 case BccIndex:
-                    return new TextStructure(Value.Envelope.Bcc, null, Scripter);
+                    return new TextStructure(Value.Bcc, null, Scripter);
                 case DateIndex:
                     return new DateTimeStructure(Value.Date, "");
                 case IsReply:
@@ -82,13 +82,11 @@ namespace G1ANT.Addon.Net
                 case BodyIndex:
                     return new TextStructure(Value.TextBody, null, Scripter);
                 case HtmlBodyIndex:
-                    if (FullMessage == null)
-                        FullMessage = Value.Folder.GetMessage(Value.UniqueId);
-                    return new TextStructure(FullMessage.HtmlBody, null, Scripter);
+                    return new TextStructure(Value.HtmlBody, null, Scripter);
                 case PriorityIndex:
-                    return new IntegerStructure(Value.Headers!=null?Value.Headers[HeaderId.Priority]:"0");
+                    return new IntegerStructure(Value.Priority);
                 case AttachmentsIndex:
-                    return Value.MessageAttachments;
+                    return new ListStructure(Value.Attachments, "", Scripter);
             }
             throw new ArgumentException($"Unknown index '{index}'", nameof(index));
         }
@@ -103,27 +101,44 @@ namespace G1ANT.Addon.Net
             switch (index.ToLower())
             {
                 case SubjectIndex:
-                    Value.Envelope.Subject = structure.ToString();
+                    Value.Subject = structure.ToString();
                     break;
                 case DateIndex:
                     if (DateTimeOffset.TryParse(structure.ToString(), out DateTimeOffset dateTime))
                     {
-                        Value.Envelope.Date = dateTime;
+                        Value.Date = dateTime;
                     }
                     break;
                 case ToIndex:
-                    Value.Envelope.To.Clear();
-                    Value.Envelope.To.Add(new MailboxAddress(structure.ToString()));
+                    Value.To.Clear();
+                    Value.To.Add(new MailboxAddress(structure.ToString()));
                     break;
                 case FromIndex:
-                    Value.Envelope.From.Clear();
-                    Value.Envelope.From.Add(new MailboxAddress(structure.ToString()));
+                    Value.From.Clear();
+                    Value.From.Add(new MailboxAddress(structure.ToString()));
+                    break;
+                case CcIndex:
+                    Value.Cc.Clear();
+                    Value.Cc.Add(new MailboxAddress(structure.ToString()));
+                    break;
+                case BccIndex:
+                    Value.Bcc.Clear();
+                    Value.Bcc.Add(new MailboxAddress(structure.ToString()));
                     break;
                 case BodyIndex:
                     Value.TextBody = structure.ToString();
                     break;
+                case HtmlBodyIndex:
+                    Value.HtmlBody = structure.ToString();
+                    break;
                 case PriorityIndex:
-                    Value.Headers[HeaderId.Priority] = structure.ToString();
+                    Value.Priority = structure.ToString();
+                    break;
+                case AttachmentsIndex:
+                    if (structure is ListStructure list)
+                        Value.Attachments = list.Value;
+                    else
+                        Value.Attachments = new List<object>(new object[] { structure.ToString() });
                     break;
                 default:
                     throw new ArgumentException($"Unknown index '{index}'", nameof(index));
@@ -132,12 +147,17 @@ namespace G1ANT.Addon.Net
 
         public override string ToString(string format = "")
         {
-            return Value.NormalizedSubject;
+            return Value.Subject;
         }
 
         protected override SimplifiedMessageSummary Parse(string value, string format = null)
         {
             throw new NotImplementedException();
+        }
+
+        public MailStructure CreateReply(bool replyToAll, string replyPrefix)
+        {
+            return new MailStructure(Value.CreateReply(replyToAll, replyPrefix));
         }
     }
 }

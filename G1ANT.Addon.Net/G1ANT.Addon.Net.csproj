@@ -74,6 +74,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\SmtpCloseCommand.cs" />
+    <Compile Include="Commands\SmtpNewMessageCommand.cs" />
+    <Compile Include="Commands\SmtpReplyCommand.cs" />
+    <Compile Include="Commands\SmtpSendCommand.cs" />
+    <Compile Include="Models\AttachmentModel.cs" />
+    <Compile Include="Models\IAttachmentModel.cs" />
+    <Compile Include="SmtpManager.cs" />
     <Compile Include="Commands\AS400OpenCommand.cs" />
     <Compile Include="Commands\ImapCloseCommand.cs" />
     <Compile Include="Commands\ImapGetEmailsCommand.cs" />
@@ -85,8 +92,10 @@
     <Compile Include="Commands\MailSmtpCommand.cs" />
     <Compile Include="Commands\PingCommand.cs" />
     <Compile Include="Commands\RestCommand.cs" />
+    <Compile Include="Commands\SmtpOpenCommand.cs" />
     <Compile Include="ImapManager.cs" />
     <Compile Include="SimplifiedMessageSummary.cs" />
+    <Compile Include="Structures\AttachmentStructure.cs" />
     <Compile Include="Structures\MailStructure.cs" />
     <Compile Include="Variables\TimeoutMailSmtpVariable.cs" />
     <Compile Include="Variables\TimeoutRemoteDesktopVariable.cs" />

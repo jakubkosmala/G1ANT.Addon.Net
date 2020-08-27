@@ -86,8 +86,8 @@ namespace G1ANT.Addon.Net
             var messageList = new ListStructure();
             foreach (var message in messages)
             {
-                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.BodyParts);
-                var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder, attachments);
+                //var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.BodyParts);
+                var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder);
                 var structure = new MailStructure(messageWithFolder, null, null);
                 messageList.AddItem(structure);
             }
