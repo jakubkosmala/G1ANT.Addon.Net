@@ -38,7 +38,7 @@ namespace G1ANT.Addon.Net.Commands
             if (client.IsConnected && client.IsAuthenticated)
             {
                 var message = arguments.Mail.Value.FullMessage;
-                ClearEmptyMailboxes(message);
+                RemoveEmptyMailboxes(message);
                 client.Send(message);      
             }
             else
@@ -47,7 +47,7 @@ namespace G1ANT.Addon.Net.Commands
             }
         }
 
-        private void ClearEmptyMailboxes(MimeMessage message)
+        private void RemoveEmptyMailboxes(MimeMessage message)
         {
             RemoveEmptyMailboxes(message.To);
             RemoveEmptyMailboxes(message.Cc);
