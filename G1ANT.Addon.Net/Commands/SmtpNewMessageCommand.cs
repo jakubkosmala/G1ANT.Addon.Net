@@ -7,6 +7,7 @@
 *    See License.txt file in the project root for full license information.
 *
 */
+using G1ANT.Addon.Net.Extensions;
 using G1ANT.Language;
 using MimeKit;
 using System;
@@ -21,14 +22,14 @@ namespace G1ANT.Addon.Net.Commands
             [Argument(Required = true, Tooltip = "Sender's email address")]
             public TextStructure From { get; set; }
 
-            [Argument(Tooltip = "Recipient's email address")]
-            public TextStructure To { get; set; } = new TextStructure(string.Empty);
+            [Argument(Tooltip = "Recipient's email address as text or list of addressess")]
+            public Structure To { get; set; } = new TextStructure(string.Empty);
 
-            [Argument(Tooltip = "Carbon copy address(es); use semicolon (;) to separate multiple addresses")]
-            public TextStructure Cc { get; set; } = new TextStructure(string.Empty);
+            [Argument(Tooltip = "Carbon copy address as text or list of addressess")]
+            public Structure Cc { get; set; } = new TextStructure(string.Empty);
 
-            [Argument(Tooltip = "Blind carbon copy address(es); use semicolon (;) to separate multiple addresses")]
-            public TextStructure Bcc { get; set; } = new TextStructure(string.Empty);
+            [Argument(Tooltip = "Blind carbon copy address as text or list of addressess")]
+            public Structure Bcc { get; set; } = new TextStructure(string.Empty);
 
             [Argument(Tooltip = "Message subject")]
             public TextStructure Subject { get; set; } = new TextStructure(string.Empty);
@@ -56,16 +57,15 @@ namespace G1ANT.Addon.Net.Commands
                 throw new ArgumentException("From argument cannot be empty");
             message.Sender = new MailboxAddress(arguments.From.Value);
             message.From.Add(new MailboxAddress(arguments.From.Value));
-            message.To.Add(new MailboxAddress(arguments.To.Value));
-            message.Cc.Add(new MailboxAddress(arguments.Cc.Value));
-            message.Bcc.Add(new MailboxAddress(arguments.Bcc.Value));
+            message.To.SetMailboxesFromStructure(arguments.To, "To");
+            message.Cc.SetMailboxesFromStructure(arguments.Cc, "Cc");
+            message.Bcc.SetMailboxesFromStructure(arguments.Bcc, "Bcc");
             message.Subject = arguments.Subject.Value;
             message.TextBody = arguments.TextBody.Value;
             message.HtmlBody = arguments.HtmlBody.Value;
             message.Attachments = arguments.Attachments.Value;
 
             Scripter.Variables.SetVariableValue(arguments.Result.Value, new MailStructure(message));
-
         }
     }
 }

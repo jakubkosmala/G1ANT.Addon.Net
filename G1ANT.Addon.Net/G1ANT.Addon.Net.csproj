@@ -78,6 +78,7 @@
     <Compile Include="Commands\SmtpNewMessageCommand.cs" />
     <Compile Include="Commands\SmtpReplyCommand.cs" />
     <Compile Include="Commands\SmtpSendCommand.cs" />
+    <Compile Include="Extensions\InternetAddressListExtension.cs" />
     <Compile Include="Models\AttachmentModel.cs" />
     <Compile Include="Models\IAttachmentModel.cs" />
     <Compile Include="SmtpManager.cs" />

@@ -3,6 +3,7 @@ using MailKit;
 using MimeKit;
 using G1ANT.Language;
 using System.Collections.Generic;
+using G1ANT.Addon.Net.Extensions;
 
 namespace G1ANT.Addon.Net
 {
@@ -110,20 +111,17 @@ namespace G1ANT.Addon.Net
                     }
                     break;
                 case ToIndex:
-                    Value.To.Clear();
-                    Value.To.Add(new MailboxAddress(structure.ToString()));
+                    Value.To.SetMailboxesFromStructure(structure, "To");
                     break;
                 case FromIndex:
                     Value.From.Clear();
                     Value.From.Add(new MailboxAddress(structure.ToString()));
                     break;
                 case CcIndex:
-                    Value.Cc.Clear();
-                    Value.Cc.Add(new MailboxAddress(structure.ToString()));
+                    Value.Cc.SetMailboxesFromStructure(structure, "Cc");
                     break;
                 case BccIndex:
-                    Value.Bcc.Clear();
-                    Value.Bcc.Add(new MailboxAddress(structure.ToString()));
+                    Value.Bcc.SetMailboxesFromStructure(structure, "Bcc");
                     break;
                 case BodyIndex:
                     Value.TextBody = structure.ToString();
