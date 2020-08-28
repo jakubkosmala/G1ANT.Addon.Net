@@ -15,18 +15,14 @@ namespace G1ANT.Addon.Net
         private const string SizeIndex = "size";
         private const string TypeIndex = "type";
         private const string PathIndex = "path";
-        private const string AttachmentFilePrefix = "g1ant.attachment.";
-        private const string AttachmentFilePostfix = ".temp";
         private string pathToTempFile = "";
-        ITempFileService tempFileService = null;
-        IGetMd5HashService getMd5HashService = null;
 
         public AttachmentStructure() : base(new MessageSummary(0)) { }
 
-        public AttachmentStructure(IAttachmentModel value, string format = "", AbstractScripter scripter = null, ITempFileService iTempFileService = null, IGetMd5HashService iGetMd5HashService = null)
+        public AttachmentStructure(IAttachmentModel value, string format = "", AbstractScripter scripter = null)
             : base(value, format)
         {
-            Init(iTempFileService, iGetMd5HashService);
+            Init();
         }
 
         public AttachmentStructure(object value, string format = "", AbstractScripter scripter = null)
@@ -35,14 +31,12 @@ namespace G1ANT.Addon.Net
             Init();
         }
 
-        private void Init(ITempFileService iTempFileService = null, IGetMd5HashService iGetMd5HashService = null)
+        private void Init()
         {
             Indexes.Add(NameIndex);
             Indexes.Add(SizeIndex);
             Indexes.Add(TypeIndex);
             Indexes.Add(PathIndex);
-            tempFileService = iTempFileService ?? new TempFileService();
-            getMd5HashService = iGetMd5HashService ?? new GetMd5HashService();
         }
 
         public override Structure Get(string index = "")
@@ -61,49 +55,16 @@ namespace G1ANT.Addon.Net
                 case TypeIndex:
                     return new TextStructure(Value.Type, null, Scripter);
                 case PathIndex:
-                    pathToTempFile = SaveAndGetPath(Value.MimeEntity, Value.Name);
+                    pathToTempFile = Value.SaveAndGetPath();
                     return new PathStructure(pathToTempFile, null, Scripter);
                 default:
                     throw new ArgumentException($"Unknown index '{index}'", nameof(index));
             }
-
-        }
-
-        private string SaveAndGetPath(MimeEntity mimeEntity, string fileName)
-        {
-            var attachmentNameHash = GetAttachmentNameHash(fileName, mimeEntity.ContentId);
-            var filePath = GetAttachmentTempFileNamePath($"{attachmentNameHash}.{fileName}");
-            if (!File.Exists(filePath))
-            {
-                if (mimeEntity is MessagePart msgPart)
-                {
-                    using (var stream = File.Create(filePath))
-                        msgPart.Message.WriteTo(stream);
-                }
-                else if (mimeEntity is MimePart mimePart)
-                {
-                    using (var stream = File.Create(filePath))
-                        mimePart.Content.DecodeTo(stream);
-                }
-                else
-                    return string.Empty;
-            }
-            return filePath;
         }
 
         public override string ToString(string format = "")
         {
             return Value.Name;
-        }
-
-        private string GetAttachmentTempFileNamePath(string attachmentNameHash)
-        {
-            return tempFileService.GetTempPath(AttachmentFilePrefix, attachmentNameHash, "");
-        }
-
-        private string GetAttachmentNameHash(string fileName, string contentId)
-        {
-            return getMd5HashService.GetMd5Hash($"{contentId}-{fileName}");
         }
 
         private void DisposeAttachment(string attachmentPath)

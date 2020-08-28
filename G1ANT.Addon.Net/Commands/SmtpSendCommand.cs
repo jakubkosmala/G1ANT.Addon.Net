@@ -54,11 +54,11 @@ namespace G1ANT.Addon.Net.Commands
             RemoveEmptyMailboxes(message.Bcc);
         }
 
-        private void RemoveEmptyMailboxes(InternetAddressList adressess)
+        private void RemoveEmptyMailboxes(InternetAddressList addressess)
         {
-            var toRermove = adressess.Cast<MailboxAddress>().Where(x => string.IsNullOrWhiteSpace(x.Address)).ToList();
-            foreach (var r in toRermove)
-                adressess.Remove(r);
+            var toRemove = addressess.Cast<MailboxAddress>().Where(x => string.IsNullOrWhiteSpace(x.Address)).ToList();
+            foreach (var r in toRemove)
+                addressess.Remove(r);
         }
     }
 }

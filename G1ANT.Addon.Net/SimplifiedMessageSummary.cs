@@ -62,17 +62,16 @@ namespace G1ANT.Addon.Net
             }
         }
 
+        private IEnumerable<MimeEntity> GetAttachmentsWithNamesSet(IEnumerable<MimeEntity> attachments)
+        {
+            return attachments.Where(x => !string.IsNullOrEmpty(x.ContentDisposition?.FileName));
+        }
+
         private List<object> CreateAttachmentStructuresFromAttachments(IEnumerable<MimeEntity> attachments)
         {
-            List<object> attachmentsList = new List<object>();
-
-            foreach (var attachment in attachments.Where(x => !string.IsNullOrEmpty(x.ContentDisposition?.FileName)))
-            {
-                AttachmentModel attachmentModel = new AttachmentModel(attachment);
-                AttachmentStructure temp = new AttachmentStructure(attachmentModel);
-                attachmentsList.Add(temp);
-            }
-            return attachmentsList;
+            return GetAttachmentsWithNamesSet(attachments)
+                .Select(a => new AttachmentStructure(new AttachmentModel(a)))
+                .ToList<object>();
         }
 
         public string MessageId
@@ -147,7 +146,7 @@ namespace G1ANT.Addon.Net
                 if (fullMessage != null)
                     fullMessage.Sender = value;
                 else
-                    throw new NotSupportedException("Cannot set Sender for recieved message");
+                    throw new NotSupportedException("Cannot set Sender for received message");
             }
         }
 
@@ -189,7 +188,7 @@ namespace G1ANT.Addon.Net
         {
             get
             {
-                if (fullMessage != null && fullMessage.Headers != null)
+                if (fullMessage?.Headers != null)
                     return fullMessage.Headers[HeaderId.Priority];
                 else if (messageSummary != null && messageSummary.Headers != null)
                     return messageSummary.Headers[HeaderId.Priority];

@@ -48,18 +48,19 @@ namespace G1ANT.Addon.Net.Commands
             }
             var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            SecureSocketOptions optons = SecureSocketOptions.Auto;
-            switch (arguments.Options.Value.ToLower())
+            SmtpManager.Instance.CreateImapClient(credentials, arguments.Host.Value, arguments.Port.Value, GetSecureSocketOptions(arguments.Options.Value), timeout);
+        }
+
+        private SecureSocketOptions GetSecureSocketOptions(string options)
+        {
+            switch (options.ToLower())
             {
                 case "ssl":
-                    optons = SecureSocketOptions.SslOnConnect;
-                    break;
+                    return SecureSocketOptions.SslOnConnect;
                 case "tls":
-                    optons = SecureSocketOptions.StartTls;
-                    break;
+                    return SecureSocketOptions.StartTls;
             }
-
-            SmtpManager.Instance.CreateImapClient(credentials, arguments.Host.Value, arguments.Port.Value, optons, timeout);
+            return SecureSocketOptions.Auto;
         }
     }
 }
