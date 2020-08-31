@@ -86,26 +86,11 @@ namespace G1ANT.Addon.Net
             var messageList = new ListStructure();
             foreach (var message in messages)
             {
-                var attachments = CreateAttachmentStructuresFromAttachments(message, folder, message.BodyParts);
-                var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder, attachments);
+                var messageWithFolder = new SimplifiedMessageSummary(message as MessageSummary, folder);
                 var structure = new MailStructure(messageWithFolder, null, null);
                 messageList.AddItem(structure);
             }
             return messageList;
-        }
-
-        private ListStructure CreateAttachmentStructuresFromAttachments(IMessageSummary message, IMailFolder folder,
-            IEnumerable<BodyPartBasic> attachments)
-        {
-            ListStructure attachmentsList = new ListStructure();
-
-            foreach (var attachment in attachments.Where(x => !string.IsNullOrEmpty(x.FileName)))
-            {
-                AttachmentModel attachmentModel = new AttachmentModel(attachment, folder, message);
-                AttachmentStructure temp = new AttachmentStructure(attachmentModel);
-                attachmentsList.AddItem(temp);
-            }
-            return attachmentsList;
         }
 
         private List<IMessageSummary> ReceiveMesssages(IMailFolder folder, Arguments arguments)
