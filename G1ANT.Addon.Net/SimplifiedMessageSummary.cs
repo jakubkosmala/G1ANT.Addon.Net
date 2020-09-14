@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using G1ANT.Addon.Net.Models;
+using MimeKit.Text;
+using System.Web.UI;
 
 namespace G1ANT.Addon.Net
 {
@@ -50,6 +52,9 @@ namespace G1ANT.Addon.Net
             get => CreateAttachmentStructuresFromAttachments(FullMessage.Attachments);
             set
             {
+                if (value == null)
+                    return;
+
                 var bodyBuilder = new BodyBuilder();
                 if (bodyBuilder.Attachments != null)
                 {
@@ -236,7 +241,7 @@ namespace G1ANT.Addon.Net
             {
                 var bodyBuilder = new BodyBuilder();
                 FillBodyBuilderAttachments(bodyBuilder);
-                bodyBuilder.HtmlBody = value;
+                bodyBuilder.HtmlBody = string.IsNullOrEmpty(value) ? null : value;
                 bodyBuilder.TextBody = TextBody;
                 FullMessage.Body = bodyBuilder.ToMessageBody();
             }
@@ -250,7 +255,7 @@ namespace G1ANT.Addon.Net
                 var bodyBuilder = new BodyBuilder();
                 FillBodyBuilderAttachments(bodyBuilder);
                 bodyBuilder.HtmlBody = HtmlBody;
-                bodyBuilder.TextBody = value;
+                bodyBuilder.TextBody = string.IsNullOrEmpty(value) ? null : value;
                 FullMessage.Body = bodyBuilder.ToMessageBody();
             }
         }
@@ -286,18 +291,19 @@ namespace G1ANT.Addon.Net
                 reply.References.Add(message.MessageId);
             }
 
-            if (message.TextBody != null)
-            {
-                reply.Body = new TextPart("plain")
-                {
-                    Text = GetQuotedText(message)
-                };
-            }
+            var bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = GetQuotedHtml(message);
+            bodyBuilder.TextBody = GetQuotedText(message);
+            reply.Body = bodyBuilder.ToMessageBody();
+
             return new SimplifiedMessageSummary(reply);
         }
 
         private string GetQuotedText(MimeMessage message)
         {
+            if (message.TextBody == null)
+                return null;
+
             using (var quoted = new StringWriter())
             {
                 var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
@@ -314,6 +320,30 @@ namespace G1ANT.Addon.Net
                     }
                 }
                 return quoted.ToString();
+            }
+        }
+
+        private string GetQuotedHtml(MimeMessage message)
+        {
+            if (message.HtmlBody == null)
+                return null;
+
+            using (var writer = new StringWriter())
+            {
+                using (var quoted = new HtmlTextWriter(writer))
+                {
+                    var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+
+                    quoted.WriteBreak();
+                    quoted.WriteLine("On {0}, {1} wrote:", message.Date.ToString("f"), !string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+
+                    quoted.AddStyleAttribute("border-left", "2px solid grey");
+                    quoted.AddStyleAttribute("padding", "10px");
+                    quoted.RenderBeginTag("div");
+                    quoted.Write(message.HtmlBody.ToString());
+                    quoted.RenderEndTag();
+                }
+                return writer.ToString();
             }
         }
     }
