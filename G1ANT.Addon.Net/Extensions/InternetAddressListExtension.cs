@@ -11,7 +11,9 @@ namespace G1ANT.Addon.Net.Extensions
             mails.Clear();
             if (newMails is TextStructure text)
             {
-                mails.Add(new MailboxAddress(text.Value));
+                var mailsArray = text.Value.Split(new char[] { ';', SpecialChars.ArraySeparator[0] });
+                foreach (var mail in mailsArray)
+                    mails.Add(new MailboxAddress(mail));
             }
             else if (newMails is ListStructure list)
             {

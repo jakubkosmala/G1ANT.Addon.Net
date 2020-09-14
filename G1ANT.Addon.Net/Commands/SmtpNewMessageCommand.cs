@@ -63,7 +63,7 @@ namespace G1ANT.Addon.Net.Commands
             message.Subject = arguments.Subject.Value;
             message.TextBody = arguments.TextBody.Value;
             message.HtmlBody = arguments.HtmlBody.Value;
-            message.Attachments = arguments.Attachments.Value;
+            message.Attachments = arguments.Attachments?.Value;
 
             Scripter.Variables.SetVariableValue(arguments.Result.Value, new MailStructure(message));
         }
