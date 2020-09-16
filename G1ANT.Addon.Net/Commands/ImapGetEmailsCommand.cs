@@ -15,6 +15,7 @@ using G1ANT.Language;
 using G1ANT.Language.Models;
 using MailKit;
 using MailKit.Search;
+using MimeKit;
 
 namespace G1ANT.Addon.Net
 {
@@ -43,6 +44,12 @@ namespace G1ANT.Addon.Net
 
             [Argument(Required = false, Tooltip = "Mark processed messages as read")]
             public BooleanStructure MarkAsRead { get; set; } = new BooleanStructure(true);
+
+            [Argument(Required = false, Tooltip = "Messages which id contains text")]
+            public TextStructure IdContains { get; set; }
+
+            [Argument(Required = false, Tooltip = "Messages which subject contains text")]
+            public TextStructure SubjectContains { get; set; }
 
             [Argument(Required = false, Tooltip = "Name of a list variable where the returned mail variables will be stored")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
@@ -128,10 +135,18 @@ namespace G1ANT.Addon.Net
 
         private static SearchQuery CreateSearchQuery(Arguments arguments)
         {
-            return SearchQuery
+            var query = SearchQuery
                 .DeliveredAfter(arguments.SinceDate?.Value ?? DateTime.MinValue)
                 .And(arguments.OnlyUnreadMessages.Value ? SearchQuery.NotSeen : SearchQuery.All)
                 .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value).Or(SearchQuery.DeliveredOn(arguments.ToDate.Value)));
+
+            if (!string.IsNullOrEmpty(arguments.IdContains?.Value))
+                query = query.And(SearchQuery.HeaderContains(HeaderId.MessageId.ToHeaderName(), arguments.IdContains.Value));
+
+            if (!string.IsNullOrEmpty(arguments.SubjectContains?.Value))
+                query = query.And(SearchQuery.SubjectContains(arguments.SubjectContains.Value));
+
+            return query;
         }
     }
 }
