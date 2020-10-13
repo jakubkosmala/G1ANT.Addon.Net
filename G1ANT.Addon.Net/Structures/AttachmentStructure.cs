@@ -55,11 +55,21 @@ namespace G1ANT.Addon.Net
                 case TypeIndex:
                     return new TextStructure(Value.Type, null, Scripter);
                 case PathIndex:
-                    pathToTempFile = Value.SaveAndGetPath();
-                    return new PathStructure(pathToTempFile, null, Scripter);
+                    return SaveAndGetAttachmentPath();
                 default:
                     throw new ArgumentException($"Unknown index '{index}'", nameof(index));
             }
+        }
+
+        private PathStructure SaveAndGetAttachmentPath()
+        {
+            var tmpPath = Value.SaveAndGetPath();
+            if (tmpPath != pathToTempFile)
+            {
+                DisposeAttachment(pathToTempFile);
+                pathToTempFile = tmpPath;
+            }
+            return new PathStructure(pathToTempFile, null, Scripter);
         }
 
         public override string ToString(string format = "")
