@@ -1,6 +1,7 @@
 ﻿using G1ANT.Language.Services;
 using MailKit;
 using MimeKit;
+using System;
 using System.IO;
 
 namespace G1ANT.Addon.Net.Models
@@ -57,6 +58,8 @@ namespace G1ANT.Addon.Net.Models
 
         private string GetAttachmentNameHash(string fileName, string contentId)
         {
+            if (string.IsNullOrEmpty(contentId))
+                contentId = Guid.NewGuid().ToString();
             return getMd5HashService.GetMd5Hash($"{contentId}-{fileName}");
         }
 
