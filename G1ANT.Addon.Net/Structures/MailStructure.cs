@@ -10,18 +10,22 @@ namespace G1ANT.Addon.Net
     [Structure(Name = "mail", Priority = 10, Default = 0, AutoCreate = false, Tooltip = "This structure stores current information about a mail message, which was downloaded with the `mail.imap` command")]
     public class MailStructure : StructureTyped<SimplifiedMessageSummary>
     {
-        private const string IdIndex = "id";
-        private const string FromIndex = "from";
-        private const string ToIndex = "to";
-        private const string CcIndex = "cc";
-        private const string BccIndex = "bcc";
-        private const string SubjectIndex = "subject";
-        private const string BodyIndex = "content";
-        private const string HtmlBodyIndex = "htmlcontent";
-        private const string DateIndex = "date";
-        private const string PriorityIndex = "priority";
-        private const string AttachmentsIndex = "attachments";
-        private const string IsReply = "isreply";
+        private static class IndexNames
+        {
+            public const string Id = "id";
+            public const string From = "from";
+            public const string To = "to";
+            public const string Cc = "cc";
+            public const string Bcc = "bcc";
+            public const string Subject = "subject";
+            public const string Body = "content";
+            public const string HtmlBody = "htmlcontent";
+            public const string Date = "date";
+            public const string Priority = "priority";
+            public const string Attachments = "attachments";
+            public const string IsReply = "isreply";
+            public const string Readed = "readed";
+        }
 
         public MailStructure() : base(new MessageSummary(0))
         {
@@ -41,18 +45,19 @@ namespace G1ANT.Addon.Net
 
         private void Init()
         {
-            Indexes.Add(IdIndex);
-            Indexes.Add(SubjectIndex);
-            Indexes.Add(FromIndex);
-            Indexes.Add(ToIndex);
-            Indexes.Add(CcIndex);
-            Indexes.Add(BccIndex);
-            Indexes.Add(DateIndex);
-            Indexes.Add(AttachmentsIndex);
-            Indexes.Add(PriorityIndex);
-            Indexes.Add(BodyIndex);
-            Indexes.Add(HtmlBodyIndex);
-            Indexes.Add(IsReply);
+            Indexes.Add(IndexNames.Id);
+            Indexes.Add(IndexNames.Subject);
+            Indexes.Add(IndexNames.From);
+            Indexes.Add(IndexNames.To);
+            Indexes.Add(IndexNames.Cc);
+            Indexes.Add(IndexNames.Bcc);
+            Indexes.Add(IndexNames.Date);
+            Indexes.Add(IndexNames.Attachments);
+            Indexes.Add(IndexNames.Priority);
+            Indexes.Add(IndexNames.Body);
+            Indexes.Add(IndexNames.HtmlBody);
+            Indexes.Add(IndexNames.IsReply);
+            Indexes.Add(IndexNames.Readed);
         }
 
         public override Structure Get(string index = "")
@@ -64,30 +69,32 @@ namespace G1ANT.Addon.Net
 
             switch (index.ToLower())
             {
-                case IdIndex:
+                case IndexNames.Id:
                     return new TextStructure(Value.MessageId, null, Scripter);
-                case SubjectIndex:
+                case IndexNames.Subject:
                     return new TextStructure(Value.Subject, null, Scripter);
-                case FromIndex:
+                case IndexNames.From:
                     return new TextStructure(Value.From, null, Scripter);
-                case ToIndex:
+                case IndexNames.To:
                     return new TextStructure(Value.To, null, Scripter);
-                case CcIndex:
+                case IndexNames.Cc:
                     return new TextStructure(Value.Cc, null, Scripter);
-                case BccIndex:
+                case IndexNames.Bcc:
                     return new TextStructure(Value.Bcc, null, Scripter);
-                case DateIndex:
+                case IndexNames.Date:
                     return new DateTimeStructure(Value.Date, "");
-                case IsReply:
+                case IndexNames.IsReply:
                     return new BooleanStructure(Value.IsReply);
-                case BodyIndex:
+                case IndexNames.Body:
                     return new TextStructure(Value.TextBody, null, Scripter);
-                case HtmlBodyIndex:
+                case IndexNames.HtmlBody:
                     return new TextStructure(Value.HtmlBody, null, Scripter);
-                case PriorityIndex:
+                case IndexNames.Priority:
                     return new IntegerStructure(Value.Priority);
-                case AttachmentsIndex:
+                case IndexNames.Attachments:
                     return new ListStructure(Value.Attachments, "", Scripter);
+                case IndexNames.Readed:
+                    return new BooleanStructure(Value.Seen, "", Scripter);
             }
             throw new ArgumentException($"Unknown index '{index}'", nameof(index));
         }
@@ -101,38 +108,41 @@ namespace G1ANT.Addon.Net
 
             switch (index.ToLower())
             {
-                case SubjectIndex:
+                case IndexNames.Subject:
                     Value.Subject = structure.ToString();
                     break;
-                case DateIndex:
+                case IndexNames.Date:
                     if (DateTimeOffset.TryParse(structure.ToString(), out DateTimeOffset dateTime))
                     {
                         Value.Date = dateTime;
                     }
                     break;
-                case ToIndex:
+                case IndexNames.To:
                     Value.To.SetMailboxesFromStructure(structure, "To");
                     break;
-                case FromIndex:
+                case IndexNames.From:
                     Value.From.Clear();
                     Value.From.Add(new MailboxAddress(structure.ToString()));
                     break;
-                case CcIndex:
+                case IndexNames.Cc:
                     Value.Cc.SetMailboxesFromStructure(structure, "Cc");
                     break;
-                case BccIndex:
+                case IndexNames.Bcc:
                     Value.Bcc.SetMailboxesFromStructure(structure, "Bcc");
                     break;
-                case BodyIndex:
+                case IndexNames.Body:
                     Value.TextBody = structure.ToString();
                     break;
-                case HtmlBodyIndex:
+                case IndexNames.HtmlBody:
                     Value.HtmlBody = structure.ToString();
                     break;
-                case PriorityIndex:
+                case IndexNames.Priority:
                     Value.Priority = structure.ToString();
                     break;
-                case AttachmentsIndex:
+                case IndexNames.Readed:
+                    Value.Seen = Convert.ToBoolean(structure.Object);
+                    break;
+                case IndexNames.Attachments:
                     if (structure is ListStructure list)
                         Value.Attachments = list.Value;
                     else
