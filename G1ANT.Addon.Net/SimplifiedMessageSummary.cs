@@ -58,7 +58,7 @@ namespace G1ANT.Addon.Net
             set
             {
                 if (Folder == null)
-                    throw new NotSupportedException("It is not a server message and has not Folder assigned");
+                    throw new NotSupportedException("It is not a server message and has no Folder assigned");
                 if (messageSummary != null)
                 {
                     if (value)
