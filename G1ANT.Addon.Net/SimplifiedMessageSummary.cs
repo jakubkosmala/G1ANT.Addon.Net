@@ -47,12 +47,12 @@ namespace G1ANT.Addon.Net
             }
         }
 
-        public bool Seen
+        public bool IsUnread
         {
             get
             {
                 if (messageSummary != null)
-                    return (messageSummary.Flags & MessageFlags.Seen) == MessageFlags.Seen;
+                    return (messageSummary.Flags & MessageFlags.Seen) != MessageFlags.Seen;
                 throw new NotSupportedException("Message has no UniqueId to get Flags info");
             }
             set
@@ -63,13 +63,13 @@ namespace G1ANT.Addon.Net
                 {
                     if (value)
                     {
-                        Folder.SetFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
-                        messageSummary.Flags |= MessageFlags.Seen;
+                        Folder.RemoveFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
+                        messageSummary.Flags &= ~MessageFlags.Seen;
                     }
                     else
                     {
-                        Folder.RemoveFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
-                        messageSummary.Flags &= ~MessageFlags.Seen;
+                        Folder.SetFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
+                        messageSummary.Flags |= MessageFlags.Seen;
                     }
                 }
                 else

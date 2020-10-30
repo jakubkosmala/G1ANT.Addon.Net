@@ -24,7 +24,7 @@ namespace G1ANT.Addon.Net
             public const string Priority = "priority";
             public const string Attachments = "attachments";
             public const string IsReply = "isreply";
-            public const string Readed = "readed";
+            public const string IsUnread = "isunread";
         }
 
         public MailStructure() : base(new MessageSummary(0))
@@ -57,7 +57,7 @@ namespace G1ANT.Addon.Net
             Indexes.Add(IndexNames.Body);
             Indexes.Add(IndexNames.HtmlBody);
             Indexes.Add(IndexNames.IsReply);
-            Indexes.Add(IndexNames.Readed);
+            Indexes.Add(IndexNames.IsUnread);
         }
 
         public override Structure Get(string index = "")
@@ -93,8 +93,8 @@ namespace G1ANT.Addon.Net
                     return new IntegerStructure(Value.Priority);
                 case IndexNames.Attachments:
                     return new ListStructure(Value.Attachments, "", Scripter);
-                case IndexNames.Readed:
-                    return new BooleanStructure(Value.Seen, "", Scripter);
+                case IndexNames.IsUnread:
+                    return new BooleanStructure(Value.IsUnread, "", Scripter);
             }
             throw new ArgumentException($"Unknown index '{index}'", nameof(index));
         }
@@ -139,8 +139,8 @@ namespace G1ANT.Addon.Net
                 case IndexNames.Priority:
                     Value.Priority = structure.ToString();
                     break;
-                case IndexNames.Readed:
-                    Value.Seen = Convert.ToBoolean(structure.Object);
+                case IndexNames.IsUnread:
+                    Value.IsUnread = Convert.ToBoolean(structure.Object);
                     break;
                 case IndexNames.Attachments:
                     if (structure is ListStructure list)
