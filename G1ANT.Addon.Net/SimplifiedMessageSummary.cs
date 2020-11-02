@@ -47,6 +47,36 @@ namespace G1ANT.Addon.Net
             }
         }
 
+        public bool IsUnread
+        {
+            get
+            {
+                if (messageSummary != null)
+                    return (messageSummary.Flags & MessageFlags.Seen) != MessageFlags.Seen;
+                throw new NotSupportedException("Message has no UniqueId to get Flags info");
+            }
+            set
+            {
+                if (Folder == null)
+                    throw new NotSupportedException("It is not a server message and has no Folder assigned");
+                if (messageSummary != null)
+                {
+                    if (value)
+                    {
+                        Folder.RemoveFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
+                        messageSummary.Flags &= ~MessageFlags.Seen;
+                    }
+                    else
+                    {
+                        Folder.SetFlags(messageSummary.UniqueId, MessageFlags.Seen, false);
+                        messageSummary.Flags |= MessageFlags.Seen;
+                    }
+                }
+                else
+                    throw new NotSupportedException("Message has no UniqueId to get Flags info");
+            }
+        }
+
         public List<object> Attachments
         {
             get => CreateAttachmentStructuresFromAttachments(FullMessage.Attachments);
