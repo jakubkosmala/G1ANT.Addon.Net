@@ -42,3 +42,13 @@ dialog ♥result
 dialog ♥status
 ```
 
+## Example 2
+
+```G1ANT
+♥headers = accept: application/json❚Content-Type: multipart/form-data❚authorization: Basic aWFjQGcxYW50LmNvbTpzTkJZWkhKRlRhOWdQQ2t1
+♥files = file*c:\-\ivoice1.jpg*application/jpg❚file*c:\-\ivoice2.jpg*application/jpg
+
+rest url https://www.testsystem.com/api/v1/documents method POST headers ‴♥headers‴ files ♥files    
+
+dialog ♥result
+```
