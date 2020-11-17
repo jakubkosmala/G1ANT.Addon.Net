@@ -79,7 +79,7 @@ namespace G1ANT.Addon.Net
 
         public List<object> Attachments
         {
-            get => CreateAttachmentStructuresFromAttachments(FullMessage.Attachments);
+            get => CreateAttachmentStructuresFromAttachments(FullMessage.BodyParts);
             set
             {
                 if (value == null)
@@ -97,9 +97,18 @@ namespace G1ANT.Addon.Net
             }
         }
 
+        private bool IsValidAttachement(MimeEntity entity)
+        {
+            if (entity.ContentDisposition != null)
+                return !string.IsNullOrEmpty(entity.ContentDisposition?.FileName);
+            if (entity is MimePart part)
+                return !string.IsNullOrEmpty(part.FileName);
+            return false;
+        }
+
         private IEnumerable<MimeEntity> GetAttachmentsWithNamesSet(IEnumerable<MimeEntity> attachments)
         {
-            return attachments.Where(x => !string.IsNullOrEmpty(x.ContentDisposition?.FileName));
+            return attachments.Where(x => IsValidAttachement(x));
         }
 
         private List<object> CreateAttachmentStructuresFromAttachments(IEnumerable<MimeEntity> attachments)

@@ -78,7 +78,7 @@ namespace G1ANT.Addon.Net
             if (client.IsConnected && client.IsAuthenticated)
             {
                 var folder = client.GetFolder(arguments.Folder.Value);
-                folder.Open(FolderAccess.ReadOnly);
+                folder.Open(FolderAccess.ReadWrite);
                 var messages = ReceiveMesssages(folder, arguments);
                 SendMessageListToScripter(folder, arguments, messages);
 
