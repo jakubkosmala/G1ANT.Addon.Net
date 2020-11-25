@@ -188,8 +188,9 @@ namespace G1ANT.Addon.Net
                 AddRequestData(request, list, toHeader);
             else
             {
-                string argName = toHeader ? "Headers" : "Parameters";
-                throw new ArgumentException($"{argName} argument is not list/dictionary type.");
+                // handle old behaviour when all entries have been converted into ListStructure due to type of argument
+                var newList = Scripter.Structures.CreateStructure(data, "", typeof(ListStructure)) as ListStructure;
+                AddRequestData(request, newList, toHeader);
             }
         }
 
