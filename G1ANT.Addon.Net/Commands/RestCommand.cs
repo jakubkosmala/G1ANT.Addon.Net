@@ -30,15 +30,11 @@ namespace G1ANT.Addon.Net
             [Argument(DefaultVariable = "timeoutrest", Tooltip = "Specifies time in milliseconds for G1ANT.Robot to wait for the command to be executed")]
             public override TimeSpanStructure Timeout { get; set; }
 
-            [Argument(Tooltip = "Headers attached to the request (list or dictionary structure is expected).\n" +
-                "- when list is passed each item should contains key and value separated by colon (:) eg. 'param1:value1❚param2:value2'\n" +
-                "- when dictionary is passed as a value its type should be explicit declared eg. '⟦dictionary⟧param1❚value1❚param2❚value2'")]
-            public Structure Headers { get; set; }
+            [Argument(Tooltip = "Headers attached to the request. Separate headers using ❚ character (Ctrl+\\); their keys and values should be separated with colon (:)")]
+            public ListStructure Headers { get; set; }
 
-            [Argument(Tooltip = "Parameters attached to the request (list or dictionary structure is expected).\n" +
-                "- when list is passed each item should contains key and value separated by colon (:) eg. 'param1:value1❚param2:value2'\n" +
-                "- when dictionary is passed as a value its type should be explicit declared eg. '⟦dictionary⟧param1❚value1❚param2❚value2'")]
-            public Structure Parameters { get; set; }
+            [Argument(Tooltip = "Parameters attached to the request. Separate parameters using ❚ character (Ctrl+\\); their keys and values should be separated with colon (:). Use key name RequestBody to send parameter value as request body")]
+            public ListStructure Parameters { get; set; }
 
             [Argument(Tooltip = "Files attached to the request. Separate files from path using ❚ character (Ctrl+\\); their keys, values and content type should be separated with asterisk (*). Use key name RequestBody to send file as request body")]
             public ListStructure Files { get; set; }
@@ -174,35 +170,6 @@ namespace G1ANT.Addon.Net
             catch
             {
                 throw new NotSupportedException($"Given method [{method}] is not supported in rest");
-            }
-        }
-
-        private void AddRequestData(RestRequest request, Structure data, bool toHeader)
-        {
-            if (data == null)
-                return;
-
-            if (data is DictionaryStructure dict)
-                AddRequestData(request, dict, toHeader);
-            else if (data is ListStructure list)
-                AddRequestData(request, list, toHeader);
-            else
-            {
-                string argName = toHeader ? "Headers" : "Parameters";
-                throw new ArgumentException($"{argName} argument is not list/dictionary type.");
-            }
-        }
-
-        private void AddRequestData(RestRequest request, DictionaryStructure dict, bool toHeader)
-        {
-            if (dict != null)
-            {
-                foreach (var listData in dict.Value)
-                {
-                    var name = listData.Key;
-                    var value = listData.Value;
-                    request.AddParameter(name, value, GetParameterType(toHeader, name));
-                }
             }
         }
 
