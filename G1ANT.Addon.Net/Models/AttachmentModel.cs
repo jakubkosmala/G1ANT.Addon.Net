@@ -65,7 +65,11 @@ namespace G1ANT.Addon.Net.Models
 
         private string GetAttachmentName()
         {
-            var fileName = mimeEntity.ContentDisposition?.FileName;
+            string fileName = "";
+            if (mimeEntity.ContentDisposition != null)
+                fileName = mimeEntity.ContentDisposition.FileName;
+            if (mimeEntity is MimePart part)
+                fileName = part.FileName;
             if (string.IsNullOrEmpty(fileName))
             {
                 fileName = emptyAttachmentDefaultName;
