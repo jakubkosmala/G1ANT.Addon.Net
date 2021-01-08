@@ -45,6 +45,9 @@
       <HintPath>..\packages\MailKit.2.1.2\lib\net45\MailKit.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Identity.Client, Version=4.24.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.24.0\lib\net45\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
     <Reference Include="MimeKit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
       <HintPath>..\packages\MimeKit.2.1.2\lib\net45\MimeKit.dll</HintPath>
     </Reference>
@@ -60,6 +63,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Security" />
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
@@ -74,6 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ImapOpenExCommand.cs" />
     <Compile Include="Commands\SmtpCloseCommand.cs" />
     <Compile Include="Commands\SmtpNewMessageCommand.cs" />
     <Compile Include="Commands\SmtpReplyCommand.cs" />
@@ -81,6 +86,8 @@
     <Compile Include="Extensions\InternetAddressListExtension.cs" />
     <Compile Include="Models\AttachmentModel.cs" />
     <Compile Include="Models\IAttachmentModel.cs" />
+    <Compile Include="Models\IAuthenticationModel.cs" />
+    <Compile Include="Models\SimpleAuthenticationModel.cs" />
     <Compile Include="SmtpManager.cs" />
     <Compile Include="Commands\AS400OpenCommand.cs" />
     <Compile Include="Commands\ImapCloseCommand.cs" />
@@ -98,6 +105,7 @@
     <Compile Include="SimplifiedMessageSummary.cs" />
     <Compile Include="Structures\AttachmentStructure.cs" />
     <Compile Include="Structures\MailStructure.cs" />
+    <Compile Include="Structures\SimpleAuthenticationStructure.cs" />
     <Compile Include="Variables\TimeoutMailSmtpVariable.cs" />
     <Compile Include="Variables\TimeoutRemoteDesktopVariable.cs" />
     <Compile Include="Variables\TimeoutConnectVariable.cs" />
