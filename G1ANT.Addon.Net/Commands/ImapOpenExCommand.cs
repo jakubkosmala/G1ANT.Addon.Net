@@ -7,16 +7,15 @@
 *    See License.txt file in the project root for full license information.
 *
 */
-
-using System;
-using G1ANT.Language;
-using System.Net;
 using G1ANT.Addon.Net.Models;
+using G1ANT.Language;
+using System;
+using System.Net;
 
-namespace G1ANT.Addon.Net
+namespace G1ANT.Addon.Net.Commands
 {
-    [Command(Name = "imap.open", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
-    public class ImapOpenCommand : Command
+    [Command(Name = "imap.openex", Tooltip = "This command uses the IMAP protocol to check an email inbox and allows the user to analyze their messages received within a specified time span, with the option to consider only unread messages and/or mark all of the checked ones as read")]
+    public class ImapOpenExCommand : Command
     {
         public class Arguments : CommandArguments
         {
@@ -29,17 +28,14 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "IMAP server port number")]
             public BooleanStructure UseSsl { get; set; } = new BooleanStructure(true);
 
-            [Argument(Required = true, Tooltip = "User login")]
-            public TextStructure Login { get; set; }
-
-            [Argument(Required = true, Tooltip = "User password")]
-            public TextStructure Password { get; set; }
+            [Argument(Tooltip = "Structure describes authentication method")]
+            public Structure Authentication { get; set; }
 
             [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
             public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
         }
 
-        public ImapOpenCommand(AbstractScripter scripter) : base(scripter)
+        public ImapOpenExCommand(AbstractScripter scripter) : base(scripter)
         { }
 
         public void Execute(Arguments arguments)
@@ -48,11 +44,19 @@ namespace G1ANT.Addon.Net
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
-            var credentials = new SimpleAuthenticationModel(arguments.Login.Value, arguments.Password.Value);
             var uri = new UriBuilder(arguments.UseSsl.Value ? "imaps" : "imap", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
 
-            ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
+            IAuthenticationModel authenticator = null;
+            if (arguments.Authentication != null)
+            {
+                if (arguments.Authentication.Object is IAuthenticationModel model)
+                    authenticator = model;
+                else
+                    throw new ArgumentException($"Authentication argument is incorrect type, try 'simpleauthentication' structure");
+            }
+
+            ImapManager.Instance.CreateImapClient(authenticator, uri, timeout);
         }
     }
 }
