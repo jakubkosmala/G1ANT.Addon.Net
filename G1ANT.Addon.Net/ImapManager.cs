@@ -16,7 +16,8 @@ namespace G1ANT.Addon.Net
         private void ConnectClient(ImapClient client)
         {
             client.Connect(uri);
-            client.Authenticate(credentials);
+            if (credentials != null)
+                client.Authenticate(credentials);
             client.Inbox.Open(FolderAccess.ReadWrite);
             client.Inbox.Subscribe();
         }

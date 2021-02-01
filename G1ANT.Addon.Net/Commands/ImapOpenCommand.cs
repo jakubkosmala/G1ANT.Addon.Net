@@ -28,10 +28,10 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "IMAP server port number")]
             public BooleanStructure UseSsl { get; set; } = new BooleanStructure(true);
 
-            [Argument(Required = true, Tooltip = "User login")]
+            [Argument(Tooltip = "User login")]
             public TextStructure Login { get; set; }
 
-            [Argument(Required = true, Tooltip = "User password")]
+            [Argument(Tooltip = "User password")]
             public TextStructure Password { get; set; }
 
             [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
@@ -47,7 +47,9 @@ namespace G1ANT.Addon.Net
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
-            var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
+            NetworkCredential credentials = null;
+            if (!string.IsNullOrEmpty(arguments.Login?.Value) && !string.IsNullOrEmpty(arguments.Password?.Value))
+                credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
             var uri = new UriBuilder(arguments.UseSsl.Value ? "imaps" : "imap", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
 

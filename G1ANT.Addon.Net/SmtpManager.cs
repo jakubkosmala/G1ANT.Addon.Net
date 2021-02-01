@@ -22,7 +22,8 @@ namespace G1ANT.Addon.Net
         private void ConnectClient(SmtpClient client)
         {
             client.Connect(host, port, socketOptions);
-            client.Authenticate(credentials);
+            if (credentials != null)
+                client.Authenticate(credentials);
         }
 
         public void DisconnectClient()
@@ -30,7 +31,7 @@ namespace G1ANT.Addon.Net
             client.Disconnect(true);
         }
 
-        public SmtpClient CreateImapClient(NetworkCredential credentials, string host, int port, SecureSocketOptions options, int timeout)
+        public SmtpClient CreateSmtpClient(NetworkCredential credentials, string host, int port, SecureSocketOptions options, int timeout)
         {
             var client = new SmtpClient { Timeout = timeout };
             this.credentials = credentials;

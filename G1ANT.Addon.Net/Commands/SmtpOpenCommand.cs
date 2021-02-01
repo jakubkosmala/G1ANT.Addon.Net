@@ -27,10 +27,10 @@ namespace G1ANT.Addon.Net.Commands
             [Argument(Tooltip = "Socket options, can be SSL, TLS or empty for none of them.")]
             public TextStructure Options { get; set; } = new TextStructure();
 
-            [Argument(Required = true, Tooltip = "User login")]
+            [Argument(Tooltip = "User login")]
             public TextStructure Login { get; set; }
 
-            [Argument(Required = true, Tooltip = "User password")]
+            [Argument(Tooltip = "User password")]
             public TextStructure Password { get; set; }
 
             [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
@@ -46,9 +46,11 @@ namespace G1ANT.Addon.Net.Commands
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
-            var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
+            NetworkCredential credentials = null;
+            if (!string.IsNullOrEmpty(arguments.Login?.Value) && !string.IsNullOrEmpty(arguments.Password?.Value))
+                credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            SmtpManager.Instance.CreateImapClient(credentials, arguments.Host.Value, arguments.Port.Value, GetSecureSocketOptions(arguments.Options.Value), timeout);
+            SmtpManager.Instance.CreateSmtpClient(credentials, arguments.Host.Value, arguments.Port.Value, GetSecureSocketOptions(arguments.Options.Value), timeout);
         }
 
         private SecureSocketOptions GetSecureSocketOptions(string options)
