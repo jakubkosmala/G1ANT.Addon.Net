@@ -13,22 +13,23 @@ using System;
 
 namespace G1ANT.Addon.Net.Structures
 {
-    [Structure(Name = "simpleauthentication", Priority = 999, Default = 0, AutoCreate = false, Tooltip = "The attachment structure stores current information about a mail attachment, which was downloaded with the `mail.` commands and stored in the `attachments` field of the mail structure")]
-    public class SimpleAuthenticationStructure : StructureTyped<SimpleAuthenticationModel>
+    [Structure(Name = "gmailoauth", Priority = 999, Default = 0, AutoCreate = false, Tooltip = "The attachment structure stores current information about a mail attachment, which was downloaded with the `mail.` commands and stored in the `attachments` field of the mail structure")]
+    public class GMailOAuthStructure : StructureTyped<GMailOAuthModel>
     {
         public static class IndexNames
         {
             public const string Username = "username";
-            public const string Password = "password";
+            public const string ClientId = "clientid";
+            public const string ClientSecret = "secret";
         }
 
-        public SimpleAuthenticationStructure(object value, string format = null, AbstractScripter scripter = null) 
+        public GMailOAuthStructure(object value, string format = null, AbstractScripter scripter = null)
             : base(value, format, scripter)
         {
             Init();
         }
 
-        public SimpleAuthenticationStructure(SimpleAuthenticationModel value, string format = "") 
+        public GMailOAuthStructure(GMailOAuthModel value, string format = "")
             : base(value, format)
         {
             Init();
@@ -37,8 +38,10 @@ namespace G1ANT.Addon.Net.Structures
         private void Init()
         {
             Indexes.Add(IndexNames.Username);
-            Indexes.Add(IndexNames.Password);
+            Indexes.Add(IndexNames.ClientId);
+            Indexes.Add(IndexNames.ClientSecret);
         }
+
         public override Structure Get(string index = "")
         {
             if (string.IsNullOrWhiteSpace(index))
@@ -48,8 +51,10 @@ namespace G1ANT.Addon.Net.Structures
             {
                 case IndexNames.Username:
                     return new TextStructure(Value.Username);
-                case IndexNames.Password:
-                    return new TextStructure(Value.Password);
+                case IndexNames.ClientId:
+                    return new TextStructure(Value.ClientId);
+                case IndexNames.ClientSecret:
+                    return new TextStructure(Value.ClientSecret);
             }
             throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));
         }
@@ -64,8 +69,11 @@ namespace G1ANT.Addon.Net.Structures
                 case IndexNames.Username:
                     Value.Username = structure.ToString();
                     break;
-                case IndexNames.Password:
-                    Value.Password = structure.ToString();
+                case IndexNames.ClientId:
+                    Value.ClientId = structure.ToString();
+                    break;
+                case IndexNames.ClientSecret:
+                    Value.ClientSecret = structure.ToString();
                     break;
                 default:
                     throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));
@@ -77,14 +85,14 @@ namespace G1ANT.Addon.Net.Structures
             return Value.Username;
         }
 
-        protected override SimpleAuthenticationModel Parse(object value, string format = null)
+        protected override GMailOAuthModel Parse(object value, string format = null)
         {
-            return new SimpleAuthenticationModel();
+            return new GMailOAuthModel();
         }
 
-        protected override SimpleAuthenticationModel Parse(string value, string format = null)
+        protected override GMailOAuthModel Parse(string value, string format = null)
         {
-            return new SimpleAuthenticationModel();
+            return new GMailOAuthModel();
         }
     }
 }
