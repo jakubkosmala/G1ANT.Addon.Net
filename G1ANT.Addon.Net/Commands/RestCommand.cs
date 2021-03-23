@@ -49,6 +49,9 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "Text to be sent as request body. Shorthand for sending text as body using \"Parameters\" argument with key name \"RequestBody\", but accepts colons as a part of content. Can't set both BodyText and BodyFile")]
             public TextStructure BodyText { get; set; }
 
+            [Argument(Tooltip = "Set to True if you want to return \"RestResult\" structure in the result which describes detailed result of rest request.")]
+            public BooleanStructure ResultAsRestResponse { get; set; } = new BooleanStructure(false);
+
             [Argument(Tooltip = "Name of a variable which will store the data returned by the API (usually json or xml)")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
 
@@ -128,7 +131,10 @@ namespace G1ANT.Addon.Net
                 throw new TimeoutException("Request timed out");
             }
 
-            Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
+            if (arguments.ResultAsRestResponse.Value)
+                Scripter.Variables.SetVariableValue(arguments.Result.Value, new RestResponseStructure(response, null, Scripter));
+            else
+                Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
             Scripter.Variables.SetVariableValue(arguments.Status.Value, new TextStructure(response.ResponseStatus.ToString()));
             Scripter.Variables.SetVariableValue(arguments.StatusCode.Value, new IntegerStructure((int)response.StatusCode));
         }
