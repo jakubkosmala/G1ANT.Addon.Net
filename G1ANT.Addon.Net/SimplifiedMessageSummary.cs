@@ -218,6 +218,18 @@ namespace G1ANT.Addon.Net
             }
         }
 
+        public InternetAddressList ReplyTo
+        {
+            get
+            {
+                if (fullMessage != null)
+                    return fullMessage.ReplyTo;
+                else if (messageSummary != null)
+                    return messageSummary.Envelope.ReplyTo;
+                return null;
+            }
+        }
+
         public bool IsReply
         {
             get
@@ -233,17 +245,17 @@ namespace G1ANT.Addon.Net
             get
             {
                 if (fullMessage?.Headers != null)
-                    return fullMessage.Headers[HeaderId.Priority];
+                    return fullMessage.Headers[HeaderId.XPriority];
                 else if (messageSummary != null && messageSummary.Headers != null)
-                    return messageSummary.Headers[HeaderId.Priority];
+                    return messageSummary.Headers[HeaderId.XPriority];
                 return "0";
             }
             set
             {
                 if (fullMessage != null && fullMessage.Headers != null)
-                    fullMessage.Headers[HeaderId.Priority] = value;
+                    fullMessage.Headers[HeaderId.XPriority] = value;
                 else if (messageSummary != null && messageSummary.Headers != null)
-                    messageSummary.Headers[HeaderId.Priority] = value;
+                    messageSummary.Headers[HeaderId.XPriority] = value;
             }
         }
 
