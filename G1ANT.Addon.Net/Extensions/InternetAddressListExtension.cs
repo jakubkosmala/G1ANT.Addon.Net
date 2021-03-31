@@ -13,12 +13,14 @@ namespace G1ANT.Addon.Net.Extensions
             {
                 var mailsArray = text.Value.Split(new char[] { ';', SpecialChars.ArraySeparator[0] });
                 foreach (var mail in mailsArray)
-                    mails.Add(new MailboxAddress(mail));
+                    if (!string.IsNullOrEmpty(mail))
+                        mails.Add(MailboxAddress.Parse(mail));
             }
             else if (newMails is ListStructure list)
             {
                 foreach (var mail in list.Value)
-                    mails.Add(new MailboxAddress(mail.ToString()));
+                    if (!string.IsNullOrEmpty(mail?.ToString()))
+                        mails.Add(MailboxAddress.Parse(mail.ToString()));
             }
             else
                 throw new ArgumentException($"'{nameOfEntity}' should be text or list structure");

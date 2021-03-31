@@ -218,6 +218,18 @@ namespace G1ANT.Addon.Net
             }
         }
 
+        public InternetAddressList ReplyTo
+        {
+            get
+            {
+                if (fullMessage != null)
+                    return fullMessage.ReplyTo;
+                else if (messageSummary != null)
+                    return messageSummary.Envelope.ReplyTo;
+                return null;
+            }
+        }
+
         public bool IsReply
         {
             get

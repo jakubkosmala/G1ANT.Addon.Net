@@ -55,8 +55,8 @@ namespace G1ANT.Addon.Net.Commands
             var message = new SimplifiedMessageSummary();
             if (string.IsNullOrWhiteSpace(arguments.From?.Value))
                 throw new ArgumentException("From argument cannot be empty");
-            message.Sender = new MailboxAddress(arguments.From.Value);
-            message.From.Add(new MailboxAddress(arguments.From.Value));
+            message.Sender = MailboxAddress.Parse(arguments.From.Value);
+            message.From.SetMailboxesFromStructure(arguments.From, "From");
             message.To.SetMailboxesFromStructure(arguments.To, "To");
             message.Cc.SetMailboxesFromStructure(arguments.Cc, "Cc");
             message.Bcc.SetMailboxesFromStructure(arguments.Bcc, "Bcc");
