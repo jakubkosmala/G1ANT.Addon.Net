@@ -118,8 +118,10 @@ namespace G1ANT.Addon.Net
 
             var request = new RestRequest(string.Empty, currentMethod);
 
-            AddRequestData(request, arguments.Headers, true);
-            AddRequestData(request, arguments.Parameters, false);
+            ParameterType paramType = currentMethod == Method.PUT ? ParameterType.QueryString : ParameterType.GetOrPost;
+
+            AddRequestData(request, arguments.Headers, ParameterType.HttpHeader);
+            AddRequestData(request, arguments.Parameters, paramType);
             AddRequestBody(request, arguments.BodyText);
             AddRequestFiles(request, arguments.Files, arguments.BodyFile);
 
@@ -183,24 +185,24 @@ namespace G1ANT.Addon.Net
             }
         }
 
-        private void AddRequestData(RestRequest request, Structure data, bool toHeader)
+        private void AddRequestData(RestRequest request, Structure data, ParameterType? parameterType)
         {
             if (data == null)
                 return;
 
             if (data is DictionaryStructure dict)
-                AddRequestData(request, dict, toHeader);
+                AddRequestData(request, dict, parameterType);
             else if (data is ListStructure list)
-                AddRequestData(request, list, toHeader);
+                AddRequestData(request, list, parameterType);
             else
             {
                 // handle old behaviour when all entries have been converted into ListStructure due to type of argument
                 var newList = Scripter.Structures.CreateStructure(data, "", typeof(ListStructure)) as ListStructure;
-                AddRequestData(request, newList, toHeader);
+                AddRequestData(request, newList, parameterType);
             }
         }
 
-        private void AddRequestData(RestRequest request, DictionaryStructure dict, bool toHeader)
+        private void AddRequestData(RestRequest request, DictionaryStructure dict, ParameterType? parameterType)
         {
             if (dict != null)
             {
@@ -208,12 +210,15 @@ namespace G1ANT.Addon.Net
                 {
                     var name = listData.Key;
                     var value = listData.Value;
-                    request.AddParameter(name, value, GetParameterType(toHeader, name));
+                    if (parameterType.HasValue)
+                        request.AddParameter(name, value, parameterType.Value);
+                    else
+                        request.AddParameter(name, value);
                 }
             }
         }
 
-        private void AddRequestData(RestRequest request, ListStructure list, bool toHeader)
+        private void AddRequestData(RestRequest request, ListStructure list, ParameterType? parameterType)
         {
             if (list != null)
             {
@@ -228,20 +233,12 @@ namespace G1ANT.Addon.Net
                     var name = separatedData[0];
                     var value = separatedData[1];
 
-                    request.AddParameter(name, value, GetParameterType(toHeader, name));
+                    if (parameterType.HasValue)
+                        request.AddParameter(name, value, parameterType.Value);
+                    else
+                        request.AddParameter(name, value);
                 }
             }
-        }
-
-        private static ParameterType GetParameterType(bool toHeader, string name)
-        {
-            if (toHeader)
-                return ParameterType.HttpHeader;
-
-            if (name.ToLower() == ParameterType.RequestBody.ToString().ToLower())
-                return ParameterType.RequestBody;
-
-            return ParameterType.GetOrPost;
         }
     }
 }
