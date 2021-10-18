@@ -1,7 +1,9 @@
 ﻿using MailKit;
 using MailKit.Net.Imap;
 using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 
 namespace G1ANT.Addon.Net
 {
@@ -18,6 +20,8 @@ namespace G1ANT.Addon.Net
             client.Connect(uri);
             if (credentials != null)
                 client.Authenticate(credentials);
+            if (!client.IsConnected || !client.IsAuthenticated)
+                throw new Exception("Could not connect or authenticate on the server");
             client.Inbox.Open(FolderAccess.ReadWrite);
             client.Inbox.Subscribe();
         }
@@ -46,6 +50,44 @@ namespace G1ANT.Addon.Net
         {
             if (!client.IsConnected)
                 ConnectClient(client);
+        }
+
+        public List<string> GetPersonalFolders()
+        {
+            ValidateConnection();
+            return client.GetFolders(client.PersonalNamespaces.FirstOrDefault()).Select(x => x.FullName).ToList();
+        }
+
+        public void MoveMailTo(SimplifiedMessageSummary mail, string folderName)
+        {
+            ValidateConnection();
+
+            var originFolder = client.GetFolder(mail.Folder.FullName);
+            var destinationFolder = client.GetFolder(folderName);
+
+            ValidateFolders(originFolder, destinationFolder);
+
+            destinationFolder.Open(FolderAccess.ReadWrite);
+            originFolder.Open(FolderAccess.ReadWrite);
+            originFolder.MoveTo(mail.UniqueId, destinationFolder);
+        }
+
+        private void ValidateConnection()
+        {
+            if (!client.IsConnected || !client.IsAuthenticated)
+                throw new Exception("Could not connect or authenticate on the server");
+        }
+
+        private void ValidateFolders(IMailFolder origin, IMailFolder destination)
+        {
+            if (origin == null)
+            {
+                throw new NullReferenceException($"Source folder {origin.Name} does not exist.");
+            }
+            if (destination == null)
+            {
+                throw new NullReferenceException($"Destination folder {destination.Name} does not exist.");
+            }
         }
     }
 }
