@@ -74,6 +74,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ImapGetFoldersCommand.cs" />
+    <Compile Include="Commands\ImapMoveToCommand.cs" />
     <Compile Include="Commands\SmtpCloseCommand.cs" />
     <Compile Include="Commands\SmtpNewMessageCommand.cs" />
     <Compile Include="Commands\SmtpReplyCommand.cs" />
