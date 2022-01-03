@@ -66,7 +66,7 @@ namespace G1ANT.Addon.Net.Models
         private string GetAttachmentName()
         {
             string fileName = "";
-            if (mimeEntity.ContentDisposition != null)
+            if (!string.IsNullOrEmpty(mimeEntity.ContentDisposition?.FileName))
                 fileName = mimeEntity.ContentDisposition.FileName;
             if (mimeEntity is MimePart part)
                 fileName = part.FileName;
@@ -79,8 +79,10 @@ namespace G1ANT.Addon.Net.Models
 
         private long GetAttachmentSize()
         {
-            if (mimeEntity.ContentDisposition != null)
+            if (!string.IsNullOrEmpty(mimeEntity.ContentDisposition?.FileName))
                 return mimeEntity.ContentDisposition.Size.GetValueOrDefault(0);
+            if (mimeEntity is MimePart part && part.Content != null && part.Content.Stream != null)
+                return part.Content.Stream.Length;
             return 0;
         }
 

@@ -99,8 +99,8 @@ namespace G1ANT.Addon.Net
 
         private bool IsValidAttachement(MimeEntity entity)
         {
-            if (entity.ContentDisposition != null)
-                return !string.IsNullOrEmpty(entity.ContentDisposition?.FileName);
+            if (!string.IsNullOrEmpty(entity.ContentDisposition?.FileName))
+                return true;
             if (entity is MimePart part)
                 return !string.IsNullOrEmpty(part.FileName);
             return false;

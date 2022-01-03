@@ -65,9 +65,7 @@ namespace G1ANT.Addon.Net
         public override Structure Get(string index = "")
         {
             if (string.IsNullOrWhiteSpace(index))
-            {
-                return new MailStructure(Value.Subject, Format);
-            }
+                return this;
 
             switch (index.ToLower())
             {
