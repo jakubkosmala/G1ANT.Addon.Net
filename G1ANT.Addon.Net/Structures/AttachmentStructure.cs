@@ -42,9 +42,7 @@ namespace G1ANT.Addon.Net
         public override Structure Get(string index = "")
         {
             if (string.IsNullOrWhiteSpace(index))
-            {
-                throw new NotSupportedException("Index not found in AttachmentStructure");
-            }
+                return this;
 
             switch (index.ToLower())
             {
