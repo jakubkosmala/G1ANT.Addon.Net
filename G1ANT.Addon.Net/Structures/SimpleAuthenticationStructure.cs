@@ -47,9 +47,9 @@ namespace G1ANT.Addon.Net.Structures
             switch (index.ToLower())
             {
                 case IndexNames.Username:
-                    return new TextStructure(Value.Username);
+                    return new TextStructure(Value?.Username);
                 case IndexNames.Password:
-                    return new TextStructure(Value.Password);
+                    return new TextStructure(Value?.Password);
             }
             throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));
         }
@@ -62,10 +62,10 @@ namespace G1ANT.Addon.Net.Structures
             switch (index.ToLower())
             {
                 case IndexNames.Username:
-                    Value.Username = structure.ToString();
+                    Value.Username = structure?.ToString();
                     break;
                 case IndexNames.Password:
-                    Value.Password = structure.ToString();
+                    Value.Password = structure?.ToString();
                     break;
                 default:
                     throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));

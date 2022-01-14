@@ -54,15 +54,15 @@ namespace G1ANT.Addon.Net.Structures
             switch (index.ToLower())
             {
                 case IndexNames.Username:
-                    return new TextStructure(Value.Username);
+                    return new TextStructure(Value?.Username);
                 case IndexNames.ClientId:
-                    return new TextStructure(Value.ClientId);
+                    return new TextStructure(Value?.ClientId);
                 case IndexNames.TenantId:
-                    return new TextStructure(Value.TenantId);
+                    return new TextStructure(Value?.TenantId);
                 case IndexNames.Scope:
-                    return new TextStructure(Value.Scope);
+                    return new TextStructure(Value?.Scope);
                 case IndexNames.CacheFolder:
-                    return new TextStructure(Value.CacheFolder);
+                    return new TextStructure(Value?.CacheFolder);
             }
             throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));
         }
@@ -75,19 +75,19 @@ namespace G1ANT.Addon.Net.Structures
             switch (index.ToLower())
             {
                 case IndexNames.Username:
-                    Value.Username = structure.ToString();
+                    Value.Username = structure?.ToString();
                     break;
                 case IndexNames.ClientId:
-                    Value.ClientId = structure.ToString();
+                    Value.ClientId = structure?.ToString();
                     break;
                 case IndexNames.TenantId:
-                    Value.TenantId = structure.ToString();
+                    Value.TenantId = structure?.ToString();
                     break;
                 case IndexNames.Scope:
-                    Value.Scope = structure.ToString();
+                    Value.Scope = structure?.ToString();
                     break;
                 case IndexNames.CacheFolder:
-                    Value.CacheFolder = structure.ToString();
+                    Value.CacheFolder = structure?.ToString();
                     break;
                 default:
                     throw new ArgumentException($"Unknown index '{index}', possible values: {string.Join(", ", index)}", nameof(index));
