@@ -26,30 +26,6 @@ namespace G1ANT.Addon.Net
             client.Inbox.Subscribe();
         }
 
-        private string GetOAuthToken(string appClientId, string username, string password)
-        {
-            SecureString securePassword = new SecureString();
-
-            Array.ForEach(password.ToCharArray(), securePassword.AppendChar);
-            var scopes = new[] { "https://outlook.office365.com/IMAP.AccessAsUser.All" };
-            var app = PublicClientApplicationBuilder.Create(appClientId).WithAuthority(AadAuthorityAudience.AzureAdMultipleOrgs).Build();
-            var asyncRequest = app.AcquireTokenByUsernamePassword(scopes, username, securePassword).ExecuteAsync(CancellationToken.None);
-            var authenticationResult = asyncRequest.GetAwaiter().GetResult();
-
-            return authenticationResult.AccessToken;
-        }
-
-        private void Authenticate(ImapClient client)
-        {
-            string UserName = "";
-            string ClientId = "";
-            string Password = "";
-
-            // Get an OAuth token:
-            var token = GetOAuthToken(ClientId, UserName, Password);
-            client.Authenticate(new SaslMechanismOAuth2(UserName, token));
-        }
-
         public void DisconnectClient()
         {
             client.Disconnect(true);

@@ -10,12 +10,13 @@
 using G1ANT.Addon.Net.Extensions;
 using G1ANT.Addon.Net.Models;
 using G1ANT.Language;
+using System;
 using System.Net;
 
 namespace G1ANT.Addon.Net.Commands
 {
-    [Command(Name = "smtp.open", Tooltip = "This command opens SMTP connection with the server")]
-    public class SmtpOpenCommand : Command
+    [Command(Name = "smtpex.open", Tooltip = "This command opens SMTP connection with the server")]
+    public class SmtpOpenExCommand : Command
     {
         public class Arguments : CommandArguments
         {
@@ -28,17 +29,14 @@ namespace G1ANT.Addon.Net.Commands
             [Argument(Tooltip = "Socket options, can be SSL, TLS or empty for none of them.")]
             public TextStructure Options { get; set; } = new TextStructure();
 
-            [Argument(Required = true, Tooltip = "User login")]
-            public TextStructure Login { get; set; }
-
-            [Argument(Required = true, Tooltip = "User password")]
-            public TextStructure Password { get; set; }
+            [Argument(Tooltip = "Structure describes authentication method")]
+            public Structure Authentication { get; set; }
 
             [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]
             public BooleanStructure IgnoreCertificateErrors { get; set; } = new BooleanStructure(false);
         }
 
-        public SmtpOpenCommand(AbstractScripter scripter) : base(scripter)
+        public SmtpOpenExCommand(AbstractScripter scripter) : base(scripter)
         { }
 
         public void Execute(Arguments arguments)
@@ -47,9 +45,16 @@ namespace G1ANT.Addon.Net.Commands
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
-            var credentials = new SimpleAuthenticationModel(arguments.Login.Value, arguments.Password.Value);
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            SmtpManager.Instance.CreateSmtpClient(credentials, arguments.Host.Value, arguments.Port.Value, arguments.Options.Value.ToSecureSocketOptions(), timeout);
+            IAuthenticationModel authenticator = null;
+            if (arguments.Authentication != null)
+            {
+                if (arguments.Authentication.Object is IAuthenticationModel model)
+                    authenticator = model;
+                else
+                    throw new ArgumentException($"Authentication argument is incorrect type, try 'simpleauthentication' structure");
+            }
+            SmtpManager.Instance.CreateSmtpClient(authenticator, arguments.Host.Value, arguments.Port.Value, arguments.Options.Value.ToSecureSocketOptions(), timeout);
         }
     }
 }

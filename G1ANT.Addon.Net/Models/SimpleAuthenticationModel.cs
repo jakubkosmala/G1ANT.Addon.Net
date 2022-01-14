@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Imap;
+using MailKit.Net.Smtp;
 using System.Net;
 
 namespace G1ANT.Addon.Net.Models
@@ -18,6 +19,15 @@ namespace G1ANT.Addon.Net.Models
         }
 
         public void Authenticate(ImapClient client)
+        {
+            if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            {
+                var credentials = new NetworkCredential(Username, Password);
+                client.Authenticate(credentials);
+            }
+        }
+
+        public void Authenticate(SmtpClient client)
         {
             if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {

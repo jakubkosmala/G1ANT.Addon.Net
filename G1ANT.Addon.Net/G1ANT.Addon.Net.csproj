@@ -93,19 +93,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\TokenCacheHelper.cs" />
     <Compile Include="Commands\ImapOpenExCommand.cs" />
     <Compile Include="Commands\SmtpCloseCommand.cs" />
     <Compile Include="Commands\SmtpNewMessageCommand.cs" />
+    <Compile Include="Commands\SmtpOpenExCommand.cs" />
     <Compile Include="Commands\SmtpReplyCommand.cs" />
     <Compile Include="Commands\SmtpSendCommand.cs" />
     <Compile Include="Extensions\InternetAddressListExtension.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Models\AttachmentModel.cs" />
-    <Compile Include="Models\GMailOAuthModel.cs" />
     <Compile Include="Models\IAttachmentModel.cs" />
     <Compile Include="Models\IAuthenticationModel.cs" />
     <Compile Include="Models\OfficeOAuthModel.cs" />
     <Compile Include="Models\SimpleAuthenticationModel.cs" />
-    <Compile Include="SmtpManager.cs" />
+    <Compile Include="API\SmtpManager.cs" />
     <Compile Include="Commands\AS400OpenCommand.cs" />
     <Compile Include="Commands\ImapCloseCommand.cs" />
     <Compile Include="Commands\ImapGetEmailsCommand.cs" />
@@ -118,10 +120,9 @@
     <Compile Include="Commands\PingCommand.cs" />
     <Compile Include="Commands\RestCommand.cs" />
     <Compile Include="Commands\SmtpOpenCommand.cs" />
-    <Compile Include="ImapManager.cs" />
-    <Compile Include="SimplifiedMessageSummary.cs" />
+    <Compile Include="API\ImapManager.cs" />
+    <Compile Include="API\SimplifiedMessageSummary.cs" />
     <Compile Include="Structures\AttachmentStructure.cs" />
-    <Compile Include="Structures\GMailOAuthStructure.cs" />
     <Compile Include="Structures\MailStructure.cs" />
     <Compile Include="Structures\OfficeOAuthStructure.cs" />
     <Compile Include="Structures\SimpleAuthenticationStructure.cs" />
@@ -137,6 +138,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Wizards\OfficeOAuthForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Wizards\OfficeOAuthForm.Designer.cs">
+      <DependentUpon>OfficeOAuthForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\OfficeOAuthWizard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -148,6 +156,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\OfficeOAuthForm.resx">
+      <DependentUpon>OfficeOAuthForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
