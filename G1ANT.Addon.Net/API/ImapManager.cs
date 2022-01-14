@@ -2,12 +2,8 @@
 using MailKit.Net.Imap;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using Microsoft.Identity.Client;
-using System.Threading;
-using MailKit.Security;
-using System.Security;
 using G1ANT.Addon.Net.Models;
+using System.Linq;
 
 namespace G1ANT.Addon.Net
 {
