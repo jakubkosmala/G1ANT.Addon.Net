@@ -6,8 +6,8 @@ namespace G1ANT.Addon.Net.Models
 {
     public class SimpleAuthenticationModel : IAuthenticationModel
     {
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         public SimpleAuthenticationModel()
         { }
