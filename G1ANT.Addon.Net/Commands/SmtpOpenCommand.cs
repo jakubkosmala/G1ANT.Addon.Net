@@ -28,10 +28,10 @@ namespace G1ANT.Addon.Net.Commands
             [Argument(Tooltip = "Socket options, can be SSL, TLS or empty for none of them.")]
             public TextStructure Options { get; set; } = new TextStructure();
 
-            [Argument(Required = true, Tooltip = "User login")]
+            [Argument(Tooltip = "User login")]
             public TextStructure Login { get; set; }
 
-            [Argument(Required = true, Tooltip = "User password")]
+            [Argument(Tooltip = "User password")]
             public TextStructure Password { get; set; }
 
             [Argument(Tooltip = "If set to `true`, the command will ignore any security certificate errors")]

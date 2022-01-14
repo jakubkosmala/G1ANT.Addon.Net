@@ -95,6 +95,8 @@
   <ItemGroup>
     <Compile Include="API\TokenCacheHelper.cs" />
     <Compile Include="Commands\ImapOpenExCommand.cs" />
+    <Compile Include="Commands\ImapGetFoldersCommand.cs" />
+    <Compile Include="Commands\ImapMoveToCommand.cs" />
     <Compile Include="Commands\SmtpCloseCommand.cs" />
     <Compile Include="Commands\SmtpNewMessageCommand.cs" />
     <Compile Include="Commands\SmtpOpenExCommand.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="Structures\MailStructure.cs" />
     <Compile Include="Structures\OfficeOAuthStructure.cs" />
     <Compile Include="Structures\SimpleAuthenticationStructure.cs" />
+    <Compile Include="Structures\RestResponseStructure.cs" />
     <Compile Include="Variables\TimeoutMailSmtpVariable.cs" />
     <Compile Include="Variables\TimeoutRemoteDesktopVariable.cs" />
     <Compile Include="Variables\TimeoutConnectVariable.cs" />

@@ -17,6 +17,7 @@ namespace G1ANT.Addon.Net
             public const string To = "to";
             public const string Cc = "cc";
             public const string Bcc = "bcc";
+            public const string ReplyTo = "replyto";
             public const string Subject = "subject";
             public const string Body = "content";
             public const string HtmlBody = "htmlcontent";
@@ -58,6 +59,7 @@ namespace G1ANT.Addon.Net
             Indexes.Add(IndexNames.HtmlBody);
             Indexes.Add(IndexNames.IsReply);
             Indexes.Add(IndexNames.IsUnread);
+            Indexes.Add(IndexNames.ReplyTo);
         }
 
         public override Structure Get(string index = "")
@@ -81,6 +83,8 @@ namespace G1ANT.Addon.Net
                     return new TextStructure(Value.Cc, null, Scripter);
                 case IndexNames.Bcc:
                     return new TextStructure(Value.Bcc, null, Scripter);
+                case IndexNames.ReplyTo:
+                    return new TextStructure(Value.ReplyTo, null, Scripter);
                 case IndexNames.Date:
                     return new DateTimeStructure(Value.Date, "");
                 case IndexNames.IsReply:
@@ -121,11 +125,13 @@ namespace G1ANT.Addon.Net
                     Value.To.SetMailboxesFromStructure(structure, "To");
                     break;
                 case IndexNames.From:
-                    Value.From.Clear();
-                    Value.From.Add(new MailboxAddress(structure.ToString()));
+                    Value.From.SetMailboxesFromStructure(structure, "From");
                     break;
                 case IndexNames.Cc:
                     Value.Cc.SetMailboxesFromStructure(structure, "Cc");
+                    break;
+                case IndexNames.ReplyTo:
+                    Value.ReplyTo.SetMailboxesFromStructure(structure, "ReplyTo");
                     break;
                 case IndexNames.Bcc:
                     Value.Bcc.SetMailboxesFromStructure(structure, "Bcc");

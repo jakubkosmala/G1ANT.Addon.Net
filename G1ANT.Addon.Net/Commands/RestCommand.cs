@@ -49,6 +49,9 @@ namespace G1ANT.Addon.Net
             [Argument(Tooltip = "Text to be sent as request body. Shorthand for sending text as body using \"Parameters\" argument with key name \"RequestBody\", but accepts colons as a part of content. Can't set both BodyText and BodyFile")]
             public TextStructure BodyText { get; set; }
 
+            [Argument(Tooltip = "Set to True if you want to return \"RestResult\" structure in the result which describes detailed result of rest request.")]
+            public BooleanStructure ResultAsRestResponse { get; set; } = new BooleanStructure(false);
+
             [Argument(Tooltip = "Name of a variable which will store the data returned by the API (usually json or xml)")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
 
@@ -115,8 +118,10 @@ namespace G1ANT.Addon.Net
 
             var request = new RestRequest(string.Empty, currentMethod);
 
-            AddRequestData(request, arguments.Headers, true);
-            AddRequestData(request, arguments.Parameters, false);
+            ParameterType paramType = currentMethod == Method.PUT ? ParameterType.QueryString : ParameterType.GetOrPost;
+
+            AddRequestData(request, arguments.Headers, ParameterType.HttpHeader);
+            AddRequestData(request, arguments.Parameters, paramType);
             AddRequestBody(request, arguments.BodyText);
             AddRequestFiles(request, arguments.Files, arguments.BodyFile);
 
@@ -128,7 +133,10 @@ namespace G1ANT.Addon.Net
                 throw new TimeoutException("Request timed out");
             }
 
-            Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
+            if (arguments.ResultAsRestResponse.Value)
+                Scripter.Variables.SetVariableValue(arguments.Result.Value, new RestResponseStructure(response, null, Scripter));
+            else
+                Scripter.Variables.SetVariableValue(arguments.Result.Value, new TextStructure(content));
             Scripter.Variables.SetVariableValue(arguments.Status.Value, new TextStructure(response.ResponseStatus.ToString()));
             Scripter.Variables.SetVariableValue(arguments.StatusCode.Value, new IntegerStructure((int)response.StatusCode));
         }
@@ -177,24 +185,24 @@ namespace G1ANT.Addon.Net
             }
         }
 
-        private void AddRequestData(RestRequest request, Structure data, bool toHeader)
+        private void AddRequestData(RestRequest request, Structure data, ParameterType? parameterType)
         {
             if (data == null)
                 return;
 
             if (data is DictionaryStructure dict)
-                AddRequestData(request, dict, toHeader);
+                AddRequestData(request, dict, parameterType);
             else if (data is ListStructure list)
-                AddRequestData(request, list, toHeader);
+                AddRequestData(request, list, parameterType);
             else
             {
                 // handle old behaviour when all entries have been converted into ListStructure due to type of argument
                 var newList = Scripter.Structures.CreateStructure(data, "", typeof(ListStructure)) as ListStructure;
-                AddRequestData(request, newList, toHeader);
+                AddRequestData(request, newList, parameterType);
             }
         }
 
-        private void AddRequestData(RestRequest request, DictionaryStructure dict, bool toHeader)
+        private void AddRequestData(RestRequest request, DictionaryStructure dict, ParameterType? parameterType)
         {
             if (dict != null)
             {
@@ -202,12 +210,15 @@ namespace G1ANT.Addon.Net
                 {
                     var name = listData.Key;
                     var value = listData.Value;
-                    request.AddParameter(name, value, GetParameterType(toHeader, name));
+                    if (parameterType.HasValue)
+                        request.AddParameter(name, value, parameterType.Value);
+                    else
+                        request.AddParameter(name, value);
                 }
             }
         }
 
-        private void AddRequestData(RestRequest request, ListStructure list, bool toHeader)
+        private void AddRequestData(RestRequest request, ListStructure list, ParameterType? parameterType)
         {
             if (list != null)
             {
@@ -222,20 +233,12 @@ namespace G1ANT.Addon.Net
                     var name = separatedData[0];
                     var value = separatedData[1];
 
-                    request.AddParameter(name, value, GetParameterType(toHeader, name));
+                    if (parameterType.HasValue)
+                        request.AddParameter(name, value, parameterType.Value);
+                    else
+                        request.AddParameter(name, value);
                 }
             }
-        }
-
-        private static ParameterType GetParameterType(bool toHeader, string name)
-        {
-            if (toHeader)
-                return ParameterType.HttpHeader;
-
-            if (name.ToLower() == ParameterType.RequestBody.ToString().ToLower())
-                return ParameterType.RequestBody;
-
-            return ParameterType.GetOrPost;
         }
     }
 }
