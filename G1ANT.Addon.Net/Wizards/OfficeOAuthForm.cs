@@ -63,6 +63,20 @@ namespace G1ANT.Addon.Net.Wizards
             return scopes.ToArray();
         }
 
+        private void AppendImapOpenExTemplate(StringBuilder template, string authenticationVariableName)
+        {
+            template.AppendLine($"imap.openex host {SpecialChars.Text}outlook.office365.com{SpecialChars.Text} port 993 usessl true ignorecertificateerrors true authentication {authenticationVariableName}");
+            template.AppendLine("- your code here");
+            template.AppendLine($"imap.close");
+        }
+
+        private void AppendSmtpOpenExTemplate(StringBuilder template, string authenticationVariableName)
+        {
+            template.AppendLine($"smtp.openex host {SpecialChars.Text}smtp.office365.com{SpecialChars.Text} port 587 options tls ignorecertificateerrors true authentication {authenticationVariableName}");
+            template.AppendLine("- your code here");
+            template.AppendLine($"smtp.close");
+        }
+
         private string GetOfficeOAuthTemplate(string tenantId, string clientId, string username, string[] scopes)
         {
             var model = CreateModelWithToken(tenantId, clientId, username, string.Join(",", scopes));
@@ -74,19 +88,9 @@ namespace G1ANT.Addon.Net.Wizards
             template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.Username}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.Username}{SpecialChars.Text}");
             template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.Scope}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.Scope}{SpecialChars.Text}");
             if (scopes.Contains(c_scopeImap))
-            {
-                template.AppendLine();
-                template.AppendLine($"imap.openex host {SpecialChars.Text}outlook.office365.com{SpecialChars.Text} port 993 usessl true ignorecertificateerrors true authentication {varName}");
-                template.AppendLine("- your code here");
-                template.AppendLine($"imap.close");
-            }
+                AppendImapOpenExTemplate(template, varName);
             if (scopes.Contains(c_scopeSmtp))
-            {
-                template.AppendLine();
-                template.AppendLine($"smtp.openex host {SpecialChars.Text}smtp.office365.com{SpecialChars.Text} port 587 options tls ignorecertificateerrors true authentication {varName}");
-                template.AppendLine("- your code here");
-                template.AppendLine($"smtp.close");
-            }
+                AppendSmtpOpenExTemplate(template, varName);
             return template.ToString();
         }
 
