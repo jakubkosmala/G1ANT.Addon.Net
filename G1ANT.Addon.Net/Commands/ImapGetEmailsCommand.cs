@@ -51,6 +51,9 @@ namespace G1ANT.Addon.Net
             [Argument(Required = false, Tooltip = "Messages which subject contains text")]
             public TextStructure SubjectContains { get; set; }
 
+            [Argument(Required = false, Tooltip = "Order messages descending by Uid")]
+            public BooleanStructure OrderDescendingByUid { get; set; } = new BooleanStructure(false);
+
             [Argument(Required = false, Tooltip = "Name of a list variable where the returned mail variables will be stored")]
             public VariableStructure Result { get; set; } = new VariableStructure("result");
         }
@@ -108,21 +111,11 @@ namespace G1ANT.Addon.Net
                 | MessageSummaryItems.UniqueId;
 
             var query = CreateSearchQuery(arguments);
-            var uids = folder.Search(query).Take(arguments.Count.Value).ToList();
+            var uids = new UniqueIdSet(arguments.OrderDescendingByUid.Value ? MailKit.Search.SortOrder.Descending : MailKit.Search.SortOrder.Ascending);
+            uids.AddRange(folder.Search(query));
 
-            if (arguments.FromEmail != null)
-            {
-                var fromMailIndex = uids.FindIndex(u => u == arguments.FromEmail.UniqueId);
-
-                uids.RemoveRange(0, fromMailIndex);
-            }
-
-            if (uids.Count > arguments.Count.Value)
-            {
-                uids.RemoveRange(arguments.Count.Value, uids.Count - arguments.Count.Value);
-            }
-
-            return folder.Fetch(uids, options).ToList();
+            var messages = folder.Fetch(uids.Take(arguments.Count.Value).ToList(), options);
+            return arguments.OrderDescendingByUid.Value ? messages.Reverse().ToList() : messages.ToList();
         }
 
         private static void MarkMessagesAsRead(IMailFolder folder, List<IMessageSummary> messages)
@@ -138,13 +131,18 @@ namespace G1ANT.Addon.Net
             var query = SearchQuery
                 .DeliveredAfter(arguments.SinceDate?.Value ?? DateTime.MinValue)
                 .And(arguments.OnlyUnreadMessages.Value ? SearchQuery.NotSeen : SearchQuery.All)
-                .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value).Or(SearchQuery.DeliveredOn(arguments.ToDate.Value)));
+                .And(SearchQuery.DeliveredBefore(arguments.ToDate.Value)
+                .Or(SearchQuery.DeliveredOn(arguments.ToDate.Value)));
 
             if (!string.IsNullOrEmpty(arguments.IdContains?.Value))
                 query = query.And(SearchQuery.HeaderContains(HeaderId.MessageId.ToHeaderName(), arguments.IdContains.Value));
 
             if (!string.IsNullOrEmpty(arguments.SubjectContains?.Value))
                 query = query.And(SearchQuery.SubjectContains(arguments.SubjectContains.Value));
+
+            if (arguments.FromEmail != null)
+                query = arguments.OrderDescendingByUid.Value ? query.And(SearchQuery.Uids(new UniqueIdRange(UniqueId.MinValue, arguments.FromEmail.UniqueId)))
+                    : query.And(SearchQuery.Uids(new UniqueIdRange(arguments.FromEmail.UniqueId, UniqueId.MaxValue)));
 
             return query;
         }
