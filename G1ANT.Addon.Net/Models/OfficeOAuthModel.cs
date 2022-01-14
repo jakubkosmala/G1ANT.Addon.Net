@@ -65,11 +65,9 @@ namespace G1ANT.Addon.Net.Models
             var app = BuildPublicClientApplication();
             var scopes = GetScopes();
             var accounts = await app.GetAccountsAsync();
-            if (!accounts.Any())
-                return await app.AcquireTokenInteractive(scopes).WithLoginHint(Username).ExecuteAsync();
-            var firstAccount = accounts.FirstOrDefault(x => x.Username.Equals(Username, StringComparison.CurrentCultureIgnoreCase));
+            var firstAccount = accounts?.FirstOrDefault(x => x.Username.Equals(Username, StringComparison.CurrentCultureIgnoreCase));
             if (firstAccount == null)
-                throw new NullReferenceException($"Cannot find '{Username}' account");
+                throw new NullReferenceException("Cannot find account in cache.");
             return await app.AcquireTokenSilent(scopes, firstAccount).ExecuteAsync();
         }
 
