@@ -13,10 +13,10 @@ namespace G1ANT.Addon.Net.Models
 {
     public class OfficeOAuthModel : IAuthenticationModel
     {
-        public string Username { get; set; } = "";
-        public string ClientId { get; set; } = "";
-        public string TenantId { get; set; } = "";
-        private string Token { get; set; } = "";
+        public string Username { get; set; }
+        public string ClientId { get; set; }
+        public string TenantId { get; set; }
+        private string Token { get; set; }
         public string Scope { get; set; } = "imap,smtp";
         public string CacheFolder { get; set; } = AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName;
 
