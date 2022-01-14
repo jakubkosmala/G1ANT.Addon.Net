@@ -13,6 +13,7 @@ using MailKit;
 using G1ANT.Language;
 using System.Net;
 using MailKit.Net.Imap;
+using G1ANT.Addon.Net.Models;
 
 namespace G1ANT.Addon.Net
 {
@@ -94,10 +95,10 @@ namespace G1ANT.Addon.Net
 
         private ImapClient CreateClient(Arguments arguments)
         {
-            var credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
+            var authenticator = new SimpleAuthenticationModel(arguments.Login?.Value, arguments.Password?.Value);
             var uri = new UriBuilder("imaps", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
-            return ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
+            return ImapManager.Instance.CreateImapClient(authenticator, uri, timeout);
         }
 
         private void SetCertificateValidationCallback(bool ignoreCertificateErrors)

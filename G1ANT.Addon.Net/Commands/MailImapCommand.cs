@@ -12,9 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MailKit;
 using G1ANT.Language;
-using G1ANT.Language.Models;
 using System.Net;
-
+using G1ANT.Addon.Net.Models;
 
 namespace G1ANT.Addon.Net
 {
@@ -68,14 +67,12 @@ namespace G1ANT.Addon.Net
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
-            NetworkCredential credentials = null;
-            if (!string.IsNullOrEmpty(arguments.Login?.Value) && !string.IsNullOrEmpty(arguments.Password?.Value))
-                credentials = new NetworkCredential(arguments.Login.Value, arguments.Password.Value);
+            var authenticator = new SimpleAuthenticationModel(arguments.Login?.Value, arguments.Password?.Value);
             var uri = new UriBuilder("imaps", arguments.Host.Value, arguments.Port.Value).Uri;
             var timeout = (int)arguments.Timeout.Value.TotalMilliseconds;
             var markAllMessagesAsRead = arguments.MarkAsRead.Value;
 
-            var client = ImapManager.Instance.CreateImapClient(credentials, uri, timeout);
+            var client = ImapManager.Instance.CreateImapClient(authenticator, uri, timeout);
 
             if (client.IsConnected && client.IsAuthenticated)
             {
