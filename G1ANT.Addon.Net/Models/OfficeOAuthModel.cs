@@ -18,7 +18,7 @@ namespace G1ANT.Addon.Net.Models
         public string TenantId { get; set; }
         private string Token { get; set; }
         public string Scope { get; set; } = "imap,smtp";
-        public string CacheFolder { get; set; } = AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName;
+        public string CacheFolder { get; set; } = AbstractSettingsContainer.Instance?.UserDocsAddonFolder.FullName;
 
         private readonly Dictionary<string, string> _mappedScopes = new Dictionary<string, string>()
         {
