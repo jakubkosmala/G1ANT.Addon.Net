@@ -15,7 +15,7 @@ using System.Net;
 
 namespace G1ANT.Addon.Net.Commands
 {
-    [Command(Name = "smtpex.open", Tooltip = "This command opens SMTP connection with the server")]
+    [Command(Name = "smtp.openex", Tooltip = "This command opens SMTP connection with the server")]
     public class SmtpOpenExCommand : Command
     {
         public class Arguments : CommandArguments
