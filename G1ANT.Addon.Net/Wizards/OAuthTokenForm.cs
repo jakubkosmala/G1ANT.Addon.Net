@@ -9,13 +9,13 @@ using System.Windows.Forms;
 
 namespace G1ANT.Addon.Net.Wizards
 {
-    public partial class OfficeOAuthForm : Form
+    public partial class OAuthTokenForm : Form
     {
         private const string c_scopeImap = "imap";
         private const string c_scopeSmtp = "smtp";
         private IMainForm mainForm;
 
-        public OfficeOAuthForm(IMainForm mainForm)
+        public OAuthTokenForm(IMainForm mainForm)
         {
             this.mainForm = mainForm;
             InitializeComponent();
@@ -96,15 +96,22 @@ namespace G1ANT.Addon.Net.Wizards
 
         private OfficeOAuthModel CreateModelWithToken(string tenantId, string clientId, string username, string scope)
         {
-            var model = new OfficeOAuthModel()
+            var model1 = new OfficeOAuthModel()
             {
                 TenantId = tenantId,
                 ClientId = clientId,
                 Username = username,
                 Scope = scope
             };
+            var model = new GmailOAuthModel()
+            {
+                ClientId = clientId,
+                ClientSecret = tenantId,
+                Username = username,
+                Scope = scope
+            };
             model.RequestTokenInteractive();
-            return model;
+            return model1;
         }
 
         private void copyToClipboard_Click(object sender, EventArgs e)

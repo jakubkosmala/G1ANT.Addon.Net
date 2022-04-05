@@ -1,6 +1,6 @@
 ﻿namespace G1ANT.Addon.Net.Wizards
 {
-    partial class OfficeOAuthForm
+    partial class OAuthTokenForm
     {
         /// <summary>
         /// Required designer variable.
@@ -208,7 +208,7 @@
             this.codeTemplate.TabIndex = 0;
             this.codeTemplate.TextChanged += new System.EventHandler(this.codeTemplate_TextChanged);
             // 
-            // OfficeOAuthForm
+            // OAuthTokenForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -225,9 +225,9 @@
             this.Controls.Add(this.label1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "OfficeOAuthForm";
+            this.Name = "OAuthTokenForm";
             this.ShowInTaskbar = false;
-            this.Text = "Office OAuth Code Generator";
+            this.Text = "OAuth Token Generator";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
