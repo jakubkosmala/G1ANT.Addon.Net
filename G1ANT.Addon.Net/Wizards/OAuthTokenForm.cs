@@ -14,13 +14,19 @@ namespace G1ANT.Addon.Net.Wizards
         private const string c_scopeImap = "imap";
         private const string c_scopeSmtp = "smtp";
         private IMainForm mainForm;
+        private Structure[] supportedStructures = new Structure[] { new OfficeOAuthStructure(""), new GMailOAuthStructure("") };
 
         public OAuthTokenForm(IMainForm mainForm)
         {
             this.mainForm = mainForm;
             InitializeComponent();
-            scopeImap.Checked = true;
-            scopeSmtp.Checked = false;
+            InitConnectionTypes();
+        }
+
+        private void InitConnectionTypes()
+        {
+            structuresBox.Items.AddRange(supportedStructures.Select(x => x.Attributes.Name).ToArray());
+            structuresBox.SelectedIndex = 0;
         }
 
         private void Cancel_Click(object sender, EventArgs e)
@@ -32,7 +38,7 @@ namespace G1ANT.Addon.Net.Wizards
         {
             try
             {
-                codeTemplate.Text = GetOfficeOAuthTemplate(tenantId.Text, clientId.Text, userName.Text, GetSelectedScopes());
+                codeTemplate.Text = GetOfficeOAuthTemplate(UpdateStructureFromSelection());
             }
             catch (Exception ex)
             {
@@ -53,65 +59,45 @@ namespace G1ANT.Addon.Net.Wizards
             }
         }
 
-        private string[] GetSelectedScopes()
+        private void AppendImapOpenExTemplate(StringBuilder template, string authenticationVariableName,
+            IOauthWizardModel oauthWizardModel)
         {
-            var scopes = new List<string>();
-            if (scopeImap.Checked)
-                scopes.Add(c_scopeImap);
-            if (scopeSmtp.Checked)
-                scopes.Add(c_scopeSmtp);
-            return scopes.ToArray();
-        }
-
-        private void AppendImapOpenExTemplate(StringBuilder template, string authenticationVariableName)
-        {
-            template.AppendLine($"imap.openex host {SpecialChars.Text}outlook.office365.com{SpecialChars.Text} port 993 usessl true ignorecertificateerrors true authentication {authenticationVariableName}");
-            template.AppendLine("- your code here");
+            template.AppendLine(
+                $"imap.openex host {SpecialChars.Text}{oauthWizardModel.ImapHost}{SpecialChars.Text} port {oauthWizardModel.ImapPort} usessl true ignorecertificateerrors true authentication {authenticationVariableName}");
+            template.AppendLine("   - your code here");
             template.AppendLine($"imap.close");
         }
 
-        private void AppendSmtpOpenExTemplate(StringBuilder template, string authenticationVariableName)
+        private void AppendSmtpOpenExTemplate(StringBuilder template, string authenticationVariableName,
+            IOauthWizardModel oauthWizardModel)
         {
-            template.AppendLine($"smtp.openex host {SpecialChars.Text}smtp.office365.com{SpecialChars.Text} port 587 options tls ignorecertificateerrors true authentication {authenticationVariableName}");
-            template.AppendLine("- your code here");
+            template.AppendLine(
+                $"smtp.openex host {SpecialChars.Text}{oauthWizardModel.SmtpHost}{SpecialChars.Text} port {oauthWizardModel.SmtpPort} options tls ignorecertificateerrors true authentication {authenticationVariableName}");
+            template.AppendLine("   - your code here");
             template.AppendLine($"smtp.close");
         }
 
-        private string GetOfficeOAuthTemplate(string tenantId, string clientId, string username, string[] scopes)
+        private string GetOfficeOAuthTemplate(Structure structure)
         {
-            var model = CreateModelWithToken(tenantId, clientId, username, string.Join(",", scopes));
-            var varName = $"{SpecialChars.Variable}authorization";
-            var template = new StringBuilder();
-            template.AppendLine($"{varName} = {SpecialChars.IndexBegin}officeoauth{SpecialChars.IndexEnd}");
-            template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.TenantId}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.TenantId}{SpecialChars.Text}");
-            template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.ClientId}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.ClientId}{SpecialChars.Text}");
-            template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.Username}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.Username}{SpecialChars.Text}");
-            template.AppendLine($"{varName}{SpecialChars.IndexBegin}{OfficeOAuthStructure.IndexNames.Scope}{SpecialChars.IndexEnd} = {SpecialChars.Text}{model.Scope}{SpecialChars.Text}");
-            if (scopes.Contains(c_scopeImap))
-                AppendImapOpenExTemplate(template, varName);
-            if (scopes.Contains(c_scopeSmtp))
-                AppendSmtpOpenExTemplate(template, varName);
-            return template.ToString();
-        }
+            if (structure is IOauthWizardModel oauthWizardModel)
+            {
+                oauthWizardModel.RequestTokenInteractive();
 
-        private OfficeOAuthModel CreateModelWithToken(string tenantId, string clientId, string username, string scope)
-        {
-            var model1 = new OfficeOAuthModel()
-            {
-                TenantId = tenantId,
-                ClientId = clientId,
-                Username = username,
-                Scope = scope
-            };
-            var model = new GmailOAuthModel()
-            {
-                ClientId = clientId,
-                ClientSecret = tenantId,
-                Username = username,
-                Scope = scope
-            };
-            model.RequestTokenInteractive();
-            return model1;
+                var varName = $"{SpecialChars.Variable}authorization";
+                var template = new StringBuilder();
+                template.AppendLine($"{varName} = {SpecialChars.IndexBegin}{structure.Attributes.Name}{SpecialChars.IndexEnd}");
+                foreach (var index in oauthWizardModel.RequiredIndexes)
+                {
+                    template.AppendLine(
+                        $"{varName}{SpecialChars.IndexBegin}{index}{SpecialChars.IndexEnd} = {SpecialChars.Text}{structure.Get(index)}{SpecialChars.Text}");
+                }
+                if (oauthWizardModel.IsImapRequested)
+                    AppendImapOpenExTemplate(template, varName, oauthWizardModel);
+                if (oauthWizardModel.IsSmtpRequested)
+                    AppendSmtpOpenExTemplate(template, varName, oauthWizardModel);
+                return template.ToString();
+            }
+            throw new ApplicationException("Bad structure type");
         }
 
         private void copyToClipboard_Click(object sender, EventArgs e)
@@ -130,5 +116,132 @@ namespace G1ANT.Addon.Net.Wizards
             copyToClipboard.Enabled = !string.IsNullOrEmpty(codeTemplate.Text);
             insertToScript.Enabled = !string.IsNullOrEmpty(codeTemplate.Text);
         }
+
+        private void structuresBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selectedStructure = GetSelectedStructure();
+            if (selectedStructure == null)
+                return;
+
+            connectionDetails.Clear();
+            switch (selectedStructure)
+            {
+                case OfficeOAuthStructure officeStructure:
+                    FillFormControls(officeStructure);
+                    break;
+                case GMailOAuthStructure gmailStructure:
+                    FillFormControls(gmailStructure);
+                    break;
+            }
+        }
+
+        private void FillFormControls(OfficeOAuthStructure officeStructure)
+        {
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    officeStructure, 
+                    OfficeOAuthStructure.IndexNames.Username));
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    officeStructure,
+                    OfficeOAuthStructure.IndexNames.TenantId));
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    officeStructure,
+                    OfficeOAuthStructure.IndexNames.ClientId));
+            connectionDetails.AddRow(
+                CreateCheckedListInfo(
+                    officeStructure,
+                    OfficeOAuthStructure.IndexNames.Scope,
+                    new[] { c_scopeImap, c_scopeSmtp }));
+        }
+
+        private void FillFormControls(GMailOAuthStructure gmailStructure)
+        {
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    gmailStructure,
+                    GMailOAuthStructure.IndexNames.Username));
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    gmailStructure,
+                    GMailOAuthStructure.IndexNames.ClientId));
+            connectionDetails.AddRow(
+                CreateTextInfo(
+                    gmailStructure,
+                    GMailOAuthStructure.IndexNames.ClientSecret));
+        }
+
+        private FormControlInfo CreateTextInfo(Structure structure, string index)
+        {
+            var value = structure.Get(index)?.ToString();
+            return new FormControlInfo()
+            {
+                Name = index,
+                Label = index,
+                Control = new TextBox()
+                {
+                    Text = value 
+                }
+
+            };
+        }
+
+        private FormControlInfo CreateCheckedListInfo(Structure structure, string index, string[] options)
+        {
+            var values = structure.Get(index)?.ToString().Split(',');
+            var scopeControl = new CheckedListBox();
+            foreach (var option in options)
+                scopeControl.Items.Add(option, values.Contains(option));
+            scopeControl.Height = scopeControl.Items.Count * scopeControl.ItemHeight + scopeControl.Height - scopeControl.ClientSize.Height;
+            return new FormControlInfo()
+            {
+                Name = index,
+                Label = index,
+                Control = scopeControl
+            };
+        }
+
+        private string GetControlValue(Control control)
+        {
+            switch (control)
+            {
+                case TextBox textBox:
+                    return textBox.Text;
+                case CheckedListBox checkedList:
+                    return string.Join(",", checkedList.CheckedItems.Cast<string>());
+            }
+            throw new ArgumentException();
+        }
+
+        private Structure GetSelectedStructure()
+        {
+            return supportedStructures.FirstOrDefault(x => x.Attributes.Name == structuresBox.SelectedItem.ToString());
+        }
+
+        private Structure UpdateStructureFromSelection()
+        {
+            var selectedStructure = GetSelectedStructure();
+            if (selectedStructure == null)
+                return null;
+            
+            foreach (var control in connectionDetails.Items)
+            {
+                try
+                {
+                    selectedStructure.Set(new TextStructure(GetControlValue(control.Control)), control.Name);
+                }
+                catch
+                { }
+            }
+            return selectedStructure;
+        }
+
+        private void structuresBox_Enter(object sender, EventArgs e)
+        {
+            UpdateStructureFromSelection();
+        }
+
+
     }
 }

@@ -38,8 +38,18 @@ namespace G1ANT.Addon.Net.Wizards
             };
         }
 
+        public void Clear()
+        {
+            Items.Clear();
+            Controls.Clear();
+            RowStyles.Clear();
+        }
+
         public void AddRow(FormControlInfo controlInfo)
         {
+            if (RowStyles.Count == 0)
+                RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
             Controls.RemoveByKey(dummyControlName);
             Controls.Add(CreateLabel(controlInfo.Label), 0, Items.Count);
             controlInfo.Control.Dock = DockStyle.Fill;

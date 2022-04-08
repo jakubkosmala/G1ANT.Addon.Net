@@ -5,7 +5,7 @@ using G1ANT.Addon.Net.Models;
 namespace G1ANT.Addon.Net.Structures
 {
     [Structure(Name = "gmailoauth", Priority = 999, Default = 0, AutoCreate = false, Tooltip = "The structure stores OAuth details how to connect to the server")]
-    public class GMailOAuthStructure : StructureTyped<GmailOAuthModel>
+    public class GMailOAuthStructure : StructureTyped<GmailOAuthModel>, IOauthWizardModel
     {
         public static class IndexNames
         {
@@ -16,6 +16,25 @@ namespace G1ANT.Addon.Net.Structures
             public const string Scope = "scope";
             public const string CacheFolder = "cachefolder";
         }
+
+        public bool IsImapRequested => true;
+
+        public bool IsSmtpRequested => true;
+
+        public string SmtpHost => "smtp.gmail.com";
+
+        public string SmtpPort => "587";
+
+        public string ImapHost => "imap.gmail.com";
+
+        public string ImapPort => "993";
+        public string[] RequiredIndexes => new[]
+        {
+            IndexNames.Username,
+            IndexNames.ClientId,
+            IndexNames.ClientSecret,
+            IndexNames.Token
+        };
 
         public GMailOAuthStructure(object value, string format = null, AbstractScripter scripter = null)
             : base(value, format, scripter)
@@ -105,6 +124,11 @@ namespace G1ANT.Addon.Net.Structures
         protected override GmailOAuthModel Parse(string value, string format = null)
         {
             return new GmailOAuthModel();
+        }
+
+        public void RequestTokenInteractive()
+        {
+            Value?.RequestTokenInteractive();
         }
     }
 }

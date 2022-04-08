@@ -14,7 +14,7 @@ using G1ANT.Addon.Net.Models;
 namespace G1ANT.Addon.Net.Structures
 {
     [Structure(Name = "officeoauth", Priority = 999, Default = 0, AutoCreate = false, Tooltip = "The structure stores OAuth details how to connect to the server")]
-    public class OfficeOAuthStructure : StructureTyped<OfficeOAuthModel>
+    public class OfficeOAuthStructure : StructureTyped<OfficeOAuthModel>, IOauthWizardModel
     {
         public static class IndexNames
         {
@@ -24,6 +24,25 @@ namespace G1ANT.Addon.Net.Structures
             public const string Scope = "scope";
             public const string CacheFolder = "cachefolder";
         }
+
+        public bool IsImapRequested => Value == null ? false : Value.Scope.ToLower().Contains("imap");
+
+        public bool IsSmtpRequested => Value == null ? false : Value.Scope.ToLower().Contains("smtp");
+
+        public string SmtpHost => "smtp.office365.com";
+
+        public string SmtpPort => "587";
+
+        public string ImapHost => "outlook.office365.com";
+
+        public string ImapPort => "993";
+        public string[] RequiredIndexes => new[]
+        {
+            IndexNames.Username,
+            IndexNames.ClientId,
+            IndexNames.TenantId,
+            IndexNames.Scope
+        };
 
         public OfficeOAuthStructure(object value, string format = null, AbstractScripter scripter = null)
             : base(value, format, scripter)
@@ -107,6 +126,11 @@ namespace G1ANT.Addon.Net.Structures
         protected override OfficeOAuthModel Parse(string value, string format = null)
         {
             return new OfficeOAuthModel();
+        }
+
+        public void RequestTokenInteractive()
+        {
+            Value?.RequestTokenInteractive();
         }
     }
 }

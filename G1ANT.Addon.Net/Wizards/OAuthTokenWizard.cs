@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace G1ANT.Addon.Net.Wizards
 {
-    [Wizard(Menu = "Tools\\Wizards", Name = "MSOffice OAuth Generator", Tooltip = "Helps generating oauth structure for imap.openex command")]
+    [Wizard(Menu = "Tools\\Wizards", Name = "OAuth Generator", Tooltip = "Helps generating oauth structure for imap.openex command")]
     public class OAuthTokenWizard : Wizard
     {
         private IMainForm FindMainForm()

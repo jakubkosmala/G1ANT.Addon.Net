@@ -28,78 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.tenantId = new System.Windows.Forms.TextBox();
-            this.clientId = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.userName = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.components = new System.ComponentModel.Container();
             this.Ok = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
-            this.scopeImap = new System.Windows.Forms.CheckBox();
-            this.scopeSmtp = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.copyToClipboard = new System.Windows.Forms.Button();
             this.insertToScript = new System.Windows.Forms.Button();
             this.codeTemplate = new System.Windows.Forms.TextBox();
-            this.groupBox1.SuspendLayout();
+            this.label1 = new System.Windows.Forms.Label();
+            this.structuresBox = new System.Windows.Forms.ComboBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.connectionDetails = new G1ANT.Addon.Net.Wizards.DynamicFormLayoutPanel(this.components);
             this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Tenant Id";
-            // 
-            // tenantId
-            // 
-            this.tenantId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tenantId.Location = new System.Drawing.Point(15, 35);
-            this.tenantId.Name = "tenantId";
-            this.tenantId.Size = new System.Drawing.Size(478, 20);
-            this.tenantId.TabIndex = 1;
-            // 
-            // clientId
-            // 
-            this.clientId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.clientId.Location = new System.Drawing.Point(15, 77);
-            this.clientId.Name = "clientId";
-            this.clientId.Size = new System.Drawing.Size(478, 20);
-            this.clientId.TabIndex = 3;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 61);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(107, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Application (client) ID";
-            // 
-            // userName
-            // 
-            this.userName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.userName.Location = new System.Drawing.Point(15, 120);
-            this.userName.Name = "userName";
-            this.userName.Size = new System.Drawing.Size(478, 20);
-            this.userName.TabIndex = 5;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 104);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(101, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Username (optional)";
             // 
             // Ok
             // 
@@ -122,39 +64,6 @@
             this.Cancel.Text = "Close";
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
-            // 
-            // scopeImap
-            // 
-            this.scopeImap.AutoSize = true;
-            this.scopeImap.Location = new System.Drawing.Point(16, 19);
-            this.scopeImap.Name = "scopeImap";
-            this.scopeImap.Size = new System.Drawing.Size(49, 17);
-            this.scopeImap.TabIndex = 8;
-            this.scopeImap.Text = "Imap";
-            this.scopeImap.UseVisualStyleBackColor = true;
-            // 
-            // scopeSmtp
-            // 
-            this.scopeSmtp.AutoSize = true;
-            this.scopeSmtp.Location = new System.Drawing.Point(71, 19);
-            this.scopeSmtp.Name = "scopeSmtp";
-            this.scopeSmtp.Size = new System.Drawing.Size(50, 17);
-            this.scopeSmtp.TabIndex = 9;
-            this.scopeSmtp.Text = "Smtp";
-            this.scopeSmtp.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.scopeImap);
-            this.groupBox1.Controls.Add(this.scopeSmtp);
-            this.groupBox1.Location = new System.Drawing.Point(15, 146);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(478, 46);
-            this.groupBox1.TabIndex = 10;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Scope";
             // 
             // groupBox2
             // 
@@ -208,51 +117,87 @@
             this.codeTemplate.TabIndex = 0;
             this.codeTemplate.TextChanged += new System.EventHandler(this.codeTemplate_TextChanged);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(84, 13);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "Connection type";
+            // 
+            // structuresBox
+            // 
+            this.structuresBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.structuresBox.FormattingEnabled = true;
+            this.structuresBox.Location = new System.Drawing.Point(102, 12);
+            this.structuresBox.Name = "structuresBox";
+            this.structuresBox.Size = new System.Drawing.Size(190, 21);
+            this.structuresBox.TabIndex = 13;
+            this.structuresBox.SelectedIndexChanged += new System.EventHandler(this.structuresBox_SelectedIndexChanged);
+            this.structuresBox.Enter += new System.EventHandler(this.structuresBox_Enter);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.connectionDetails);
+            this.groupBox1.Location = new System.Drawing.Point(15, 39);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(478, 158);
+            this.groupBox1.TabIndex = 15;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Connection details";
+            // 
+            // connectionDetails
+            // 
+            this.connectionDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.connectionDetails.ColumnCount = 2;
+            this.connectionDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.connectionDetails.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.connectionDetails.Location = new System.Drawing.Point(6, 19);
+            this.connectionDetails.Name = "connectionDetails";
+            this.connectionDetails.RowCount = 2;
+            this.connectionDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.connectionDetails.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.connectionDetails.Size = new System.Drawing.Size(466, 133);
+            this.connectionDetails.TabIndex = 14;
+            // 
             // OAuthTokenForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(510, 459);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.structuresBox);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.Ok);
-            this.Controls.Add(this.userName);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.clientId);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.tenantId);
-            this.Controls.Add(this.label1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "OAuthTokenForm";
             this.ShowInTaskbar = false;
-            this.Text = "OAuth Token Generator";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.Text = "OAuth Structure Generator";
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox tenantId;
-        private System.Windows.Forms.TextBox clientId;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox userName;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button Ok;
         private System.Windows.Forms.Button Cancel;
-        private System.Windows.Forms.CheckBox scopeImap;
-        private System.Windows.Forms.CheckBox scopeSmtp;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox codeTemplate;
         private System.Windows.Forms.Button copyToClipboard;
         private System.Windows.Forms.Button insertToScript;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox structuresBox;
+        private DynamicFormLayoutPanel connectionDetails;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

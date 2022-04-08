@@ -107,7 +107,7 @@
     <Compile Include="Commands\SmtpSendCommand.cs" />
     <Compile Include="Extensions\InternetAddressListExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="Interfaces\IArgumentsWizard.cs" />
+    <Compile Include="Models\IOauthWizardModel.cs" />
     <Compile Include="Models\AttachmentModel.cs" />
     <Compile Include="Models\GmailOAuthModel.cs" />
     <Compile Include="Models\IAttachmentModel.cs" />

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Google.Apis.Oauth2.v2;
 using Google.Apis.Services;
+using Google.Apis.Util;
 
 namespace G1ANT.Addon.Net.Models
 {
@@ -32,13 +33,6 @@ namespace G1ANT.Addon.Net.Models
             { "smtp",  "https://mail.google.com/" },
         };
 
-        //new[] { 
-        //                //"https://mail.google.com/",
-        //                "https://www.googleapis.com/auth/gmail.readonly",
-        //                //"https://www.googleapis.com/auth/gmail.send",
-        //                "https://www.googleapis.com/auth/userinfo.email"
-        //            },
-
         public GmailOAuthModel()
         {
             CacheFolder = Path.Combine(AbstractSettingsContainer.Instance?.UserDocsAddonFolder.FullName, "gmail-client-secrets");
@@ -46,13 +40,14 @@ namespace G1ANT.Addon.Net.Models
 
         public void Authenticate(ImapClient client)
         {
-            var token = GetAccessToken().Result;
+            var token = Task.Run(async () => await GetAccessToken()).Result;
             client.Authenticate(new SaslMechanismOAuth2(Username, token));
         }
 
         public void Authenticate(SmtpClient client)
         {
-            var token = GetAccessToken().Result;
+            //var token = GetAccessToken().Result;
+            var token = Task.Run(async () => await GetAccessToken()).Result;
             client.Authenticate(new SaslMechanismOAuth2(Username, token));
         }
 
@@ -80,7 +75,8 @@ namespace G1ANT.Addon.Net.Models
                     }),
                 Username,
                 token);
-            await credentials.RefreshTokenAsync(new CancellationTokenSource(5000).Token);
+            if (credentials.Token.IsExpired(SystemClock.Default))
+                await credentials.RefreshTokenAsync(new CancellationTokenSource(10000).Token);
             return credentials;
         }
 
@@ -134,7 +130,7 @@ namespace G1ANT.Addon.Net.Models
             if (string.IsNullOrEmpty(Username))
                 throw new ArgumentNullException(nameof(Username));
 
-            var task = Task.Run(async () => await AcquireTokenInteractive());
+            Task.Run(async () => await AcquireTokenInteractive()).Wait();
             if (string.IsNullOrEmpty(Token))
                 throw new NullReferenceException($"Cannot retrieve Token for user {Username}");
         }
