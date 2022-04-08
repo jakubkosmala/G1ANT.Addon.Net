@@ -46,7 +46,6 @@ namespace G1ANT.Addon.Net.Models
 
         public void Authenticate(SmtpClient client)
         {
-            //var token = GetAccessToken().Result;
             var token = Task.Run(async () => await GetAccessToken()).Result;
             client.Authenticate(new SaslMechanismOAuth2(Username, token));
         }
