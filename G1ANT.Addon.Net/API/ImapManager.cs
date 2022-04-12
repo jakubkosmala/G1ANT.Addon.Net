@@ -2,14 +2,14 @@
 using MailKit.Net.Imap;
 using System;
 using System.Collections.Generic;
-using System.Net;
+using G1ANT.Addon.Net.Models;
 using System.Linq;
 
 namespace G1ANT.Addon.Net
 {
     public sealed class ImapManager
     {
-        private NetworkCredential credentials;
+        private IAuthenticationModel authenticator;
         private ImapClient client;
         private Uri uri;
 
@@ -18,10 +18,7 @@ namespace G1ANT.Addon.Net
         private void ConnectClient(ImapClient client)
         {
             client.Connect(uri);
-            if (credentials != null)
-                client.Authenticate(credentials);
-            if (!client.IsConnected || !client.IsAuthenticated)
-                throw new Exception("Could not connect or authenticate on the server");
+            authenticator?.Authenticate(client);
             client.Inbox.Open(FolderAccess.ReadWrite);
             client.Inbox.Subscribe();
         }
@@ -31,10 +28,10 @@ namespace G1ANT.Addon.Net
             client.Disconnect(true);
         }
 
-        public ImapClient CreateImapClient(NetworkCredential credentials, Uri uri, int timeout)
+        public ImapClient CreateImapClient(IAuthenticationModel authenticator, Uri uri, int timeout)
         {
             var client = new ImapClient { Timeout = timeout };
-            this.credentials = credentials;
+            this.authenticator = authenticator;
             this.client = client;
             this.uri = uri;
             ConnectClient(this.client);
