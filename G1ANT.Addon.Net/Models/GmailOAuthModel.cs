@@ -35,7 +35,8 @@ namespace G1ANT.Addon.Net.Models
 
         public GmailOAuthModel()
         {
-            CacheFolder = Path.Combine(AbstractSettingsContainer.Instance?.UserDocsAddonFolder.FullName, "gmail-client-secrets");
+            if (AbstractSettingsContainer.Instance != null)
+                CacheFolder = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName, "gmail-client-secrets");
         }
 
         public void Authenticate(ImapClient client)
@@ -136,7 +137,7 @@ namespace G1ANT.Addon.Net.Models
 
         private IDataStore GetDataStore()
         {
-            return new FileDataStore(CacheFolder, true);
+            return CacheFolder != null ? new FileDataStore(CacheFolder, true) : null;
         }
     }
 }
