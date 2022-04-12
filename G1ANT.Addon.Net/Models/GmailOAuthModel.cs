@@ -137,7 +137,7 @@ namespace G1ANT.Addon.Net.Models
 
         private IDataStore GetDataStore()
         {
-            return new FileDataStore(CacheFolder, true);
+            return CacheFolder != null ? new FileDataStore(CacheFolder, true) : null;
         }
     }
 }
