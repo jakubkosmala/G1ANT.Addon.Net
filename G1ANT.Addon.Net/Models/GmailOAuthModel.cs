@@ -35,7 +35,8 @@ namespace G1ANT.Addon.Net.Models
 
         public GmailOAuthModel()
         {
-            CacheFolder = Path.Combine(AbstractSettingsContainer.Instance?.UserDocsAddonFolder.FullName, "gmail-client-secrets");
+            if (AbstractSettingsContainer.Instance != null)
+                CacheFolder = Path.Combine(AbstractSettingsContainer.Instance.UserDocsAddonFolder.FullName, "gmail-client-secrets");
         }
 
         public void Authenticate(ImapClient client)
