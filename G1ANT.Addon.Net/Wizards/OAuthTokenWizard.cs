@@ -3,8 +3,8 @@ using System.Windows.Forms;
 
 namespace G1ANT.Addon.Net.Wizards
 {
-    [Wizard(Menu = "Tools\\Wizards", Name = "MSOffice OAuth Generator", Tooltip = "Helps generating officeoauth structure for imap.openex command")]
-    public class OfficeOAuthWizard : Wizard
+    [Wizard(Menu = "Tools\\Wizards", Name = "OAuth Generator", Tooltip = "Helps generating oauth structure for imap.openex command")]
+    public class OAuthTokenWizard : Wizard
     {
         private IMainForm FindMainForm()
         {
@@ -23,7 +23,7 @@ namespace G1ANT.Addon.Net.Wizards
             var mainForm = FindMainForm();
             if (mainForm != null)
             {
-                using (var wizard = new OfficeOAuthForm(mainForm))
+                using (var wizard = new OAuthTokenForm(mainForm))
                     wizard.ShowDialog();
             }
         }
