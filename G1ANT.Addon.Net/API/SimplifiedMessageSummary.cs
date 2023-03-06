@@ -329,7 +329,7 @@ namespace G1ANT.Addon.Net
                 reply.Cc.AddRange(message.Cc);
             }
 
-            if (!message.Subject.StartsWith(replyPrefix, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(message.Subject) || !message.Subject.StartsWith(replyPrefix, StringComparison.OrdinalIgnoreCase))
                 reply.Subject = $"{replyPrefix}{message.Subject}";
             else
                 reply.Subject = message.Subject;
